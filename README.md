@@ -1,2 +1,4 @@
 # cis4004
-Project site for a full-stack web application for UCF's CIS-4004 course.
+Project site for a full-stack web application on weather-related information for UCF's CIS-4004 course.
+
+Looking to utilize the NOAA's API Web service to import historical weather data for systems such as Hurricanes, and to potentially see the tracks of each weather system with graphs and charts.
