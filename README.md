@@ -1,4 +1,9 @@
 # cis4004
-Project site for a full-stack web application on weather-related information for UCF's CIS-4004 course.
 
-Looking to utilize the weather.gov/s API Web service to import historical weather data for systems such as Hurricanes, and to potentially see the tracks of each weather system with graphs and charts.
+OBJECTIVE:
+Create a full-stack web application on weather-related information for UCF's CIS-4004 course.
+
+METHODOLOGY:
+- Github.io for commits and changes.
+- Microsoft Azure for hosting full-stack as we need back-end support (which github pages doesn't support unfortunately, unless you use a bunch of magic :/ ).
+- Weather.gov for forecast API (thank you US gov for having this).
