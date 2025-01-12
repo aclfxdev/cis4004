@@ -1,8 +1,29 @@
-// Scripts for Web APIs below (later).
+// Scripts for Web APIs below:
 
 if (navigator.geolocation)
 {
-  navigator.geolocation.getCurrentPosition((position) => {console.log(position)}, (error) => console.error("%cError getting location: ${error.message}", "color:red"))
+  navigator.geolocation.getCurrentPosition
+  (
+    (position) => // Geolocation was a success.
+    { 
+      const latitude = position.coords.latitude;
+      const longitude = positon.coords.longitude;
+      console.log
+      (
+        "%cLatitude: ${latitude}\nLongitude: ${longitude}",
+        "color: green"
+      )
+    },
+
+    (error) => // Geolocation was a failure.
+    {
+      console.error
+      (
+        "%cError getting location: ${error.message}",
+        "color:red"
+      )
+    }
+  )
 }
 
 else
