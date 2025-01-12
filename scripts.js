@@ -10,7 +10,7 @@ if (navigator.geolocation)
       const longitude = position.coords.longitude;
       console.log
       (
-        '%cLatitude: ${latitude}\nLongitude: ${longitude}',
+        `%cLatitude: ${latitude}\nLongitude: ${longitude}`,
         "color: green"
       )
     },
@@ -18,7 +18,7 @@ if (navigator.geolocation)
     {
       console.error
       (
-        '%cError getting location: ${error.message}',
+        `%cError getting location: ${error.message}`,
         "color:red"
       )
     }
