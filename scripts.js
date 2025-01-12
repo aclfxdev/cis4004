@@ -7,7 +7,7 @@ if (navigator.geolocation)
     (position) => // Geolocation was a success.
     { 
       const latitude = position.coords.latitude;
-      const longitude = positon.coords.longitude;
+      const longitude = position.coords.longitude;
       console.log
       (
         "%cLatitude: ${latitude}\nLongitude: ${longitude}",
