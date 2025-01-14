@@ -83,12 +83,42 @@ function createWeatherCards(periods)
     const cardContainer = document.getElementById("card-container");
     cardContainer.innerHTML = ""; // Clear existing cards if any
 
+    // Keep track of the last processed date
+    let lastDate = "";
+
     // Create a card for each element in the periods array
     periods.forEach((element) => 
     {
-        // Create the html elements
+        // Parse the start time and format it
+        const startTime = new Date(element.startTime);
+        const localDate = startTime.toLocaleDateString([], { 
+            weekday: 'long', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        const formattedDate = startTime.toLocaleDateString([], { 
+            month: '2-digit', 
+            day: '2-digit' 
+        });
+        const localTime = startTime.toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true, // Optional: Display time in 12-hour format (am/pm)
+        });
+
+        // Add a header for the new day if the date changes
+        if (formattedDate !== lastDate) 
+        {
+            const header = document.createElement("h2");
+            header.textContent = `${startTime.toLocaleDateString([], { weekday: 'long' })}, ${formattedDate}`;
+            header.setAttribute("class", "day-header");
+            cardContainer.appendChild(header);
+            lastDate = formattedDate;
+        }
+
+        // Create the card elements
         const div = document.createElement("div");
-        const h2 = document.createElement("h2");
+        const h3 = document.createElement("h3");
         const img = document.createElement("img");
         const p = document.createElement("p");
 
@@ -102,20 +132,12 @@ function createWeatherCards(periods)
         img.setAttribute("src", icon);
         img.setAttribute("alt", element.shortForecast);
 
-        // Convert the UTC start time to local time
-        const localTime = new Date(element.startTime).toLocaleTimeString([], 
-        {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true, // Optional: Display time in 12-hour format (am/pm)
-        });
-
         // Set the text content for the card title and forecast
-        h2.textContent = `${localTime}: ${element.name}`;
+        h3.textContent = `${localTime}: ${element.name}`;
         p.textContent = `${element.shortForecast}, Temp: ${element.temperature}°${element.temperatureUnit}`;
 
         // Append the title, image, and forecast to the card div
-        div.appendChild(h2);
+        div.appendChild(h3);
         div.appendChild(img);
         div.appendChild(p);
 
@@ -130,5 +152,3 @@ function createWeatherCards(periods)
     link.href = periods[0].icon.replace("medium", "small");
     head.appendChild(link);
 }
-
-
