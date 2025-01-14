@@ -17,7 +17,9 @@
     flex-direction: column;
     align-items: center;
     border: 1px solid #ccc;
-    padding: 10px;
+    padding: 10px; /* Existing padding */
+    padding-left: 15px; /* Additional padding for left */
+    padding-right: 15px; /* Additional padding for right */
     border-radius: 8px;
     background-color: #f9f9f9;
     min-width: 200px;
@@ -38,7 +40,7 @@
     align-items: center;
     border: 1px solid #ddd;
     padding: 10px;
-    margin: 5px 0;
+    margin: 10px 5px; /* Add space between cards and column edges */
     border-radius: 8px;
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
