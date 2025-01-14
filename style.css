@@ -14,7 +14,7 @@ body {
     overflow-x: auto;
     padding: 10px;
     gap: 20px;
-    background-color: lightblue; /* Optional for debugging */
+    background-color: lightgrey;
     box-sizing: border-box; /* Ensure padding doesn't affect width */
 }
 
