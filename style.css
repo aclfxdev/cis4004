@@ -7,6 +7,7 @@ body {
     );
     background-attachment: fixed;
 }
+
 h1 {
     background: linear-gradient(
         rgb(180, 180, 255),
@@ -22,22 +23,26 @@ h1 {
     margin: 0 auto;
     padding: 10px;
 }
+
 h2 {
     text-shadow: 2px 2px 5px rgb(240, 240, 255);
     color: rgb(60, 30, 85);
 }
+
 p {
     font-size: 1.2em;
     font-weight: bold;
     color: white;
     text-shadow: 2px 2px 5px black;
 }
+
 #card-container{
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
 }
+
 .card {
     display: inline-block;
     padding: 10px;
@@ -53,11 +58,13 @@ p {
         rgb(120, 120, 170)
     );
 }
+
 .card h2, p {
     text-align: center;
     text-wrap: wrap;
     font-weight: bold;
 }
+
 .card img {
     display: block;
     width: 50%;
@@ -68,7 +75,6 @@ p {
 }
 
 // Roboto font identifier.
-
 .roboto-font-user {
   font-family: "Roboto", serif;
   font-optical-sizing: auto;
@@ -76,4 +82,12 @@ p {
   font-style: normal;
   font-variation-settings:
     "wdth" 100;
+}
+
+// Styling day headers for forecasts.
+.day-header {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 20px 0 10px;
+    color: #333;
 }
