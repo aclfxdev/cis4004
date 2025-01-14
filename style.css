@@ -1,5 +1,9 @@
 body {
-    font-family: Verdana, sans-serif;
+  font-family: "Roboto", serif;
+  font-optical-sizing: auto;
+  font-weight: 100;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
     background: linear-gradient(
         rgb(240, 240, 255),
         rgb(180, 180, 255),
