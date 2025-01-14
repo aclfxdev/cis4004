@@ -110,7 +110,7 @@ function createWeatherCards(periods)
         const dayHeader = document.createElement("h2");
         dayHeader.className = "day-header";
         const formattedHeader = new Date(dayPeriods[0].startTime).toLocaleDateString([], {
-            weekday: 'long',
+            weekday: 'short',
             month: 'long',
             day: 'numeric',
         });
