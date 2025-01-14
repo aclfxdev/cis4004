@@ -81,74 +81,74 @@ function createWeatherCards(periods)
 {
     // Store the card container div from index.html
     const cardContainer = document.getElementById("card-container");
-    cardContainer.innerHTML = ""; // Clear existing cards if any
+    cardContainer.innerHTML = ""; // Clear existing content
 
-    // Keep track of the last processed date
-    let lastDate = "";
-
-    // Create a card for each element in the periods array
+    // Group periods by day
+    const days = {};
     periods.forEach((element) => 
     {
-        // Parse the start time and format it
-        const startTime = new Date(element.startTime);
-        const localDate = startTime.toLocaleDateString([], { 
-            weekday: 'long', 
-            month: 'long', 
-            day: 'numeric' 
-        });
-        const formattedDate = startTime.toLocaleDateString([], { 
+        const date = new Date(element.startTime).toLocaleDateString([], { 
             month: '2-digit', 
-            day: '2-digit' 
+            day: '2-digit', 
+            year: 'numeric' 
         });
-        const localTime = startTime.toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true, // Optional: Display time in 12-hour format (am/pm)
-        });
-
-        // Add a header for the new day if the date changes
-        if (formattedDate !== lastDate) 
+        if (!days[date]) 
         {
-            const header = document.createElement("h2");
-            header.textContent = `${startTime.toLocaleDateString([], { weekday: 'long' })}, ${formattedDate}`;
-            header.setAttribute("class", "day-header");
-            cardContainer.appendChild(header);
-            lastDate = formattedDate;
+            days[date] = [];
         }
-
-        // Create the card elements
-        const div = document.createElement("div");
-        const h3 = document.createElement("h3");
-        const img = document.createElement("img");
-        const p = document.createElement("p");
-
-        // Set the icon to be used as the large version
-        const icon = element.icon.replace("medium", "large");
-
-        // Set the new div class to "card"
-        div.setAttribute("class", "card");
-
-        // Set the new img attributes
-        img.setAttribute("src", icon);
-        img.setAttribute("alt", element.shortForecast);
-
-        // Set the text content for the card title and forecast
-        h3.textContent = `${localTime}: ${element.name}`;
-        p.textContent = `${element.shortForecast}, Temp: ${element.temperature}°${element.temperatureUnit}`;
-
-        // Append the title, image, and forecast to the card div
-        div.appendChild(h3);
-        div.appendChild(img);
-        div.appendChild(p);
-
-        // Append the card to the card container div
-        cardContainer.appendChild(div);
+        days[date].push(element);
     });
 
-    // Set favicon to the first weather icon
-    const head = document.getElementsByTagName("head")[0];
-    const link = document.createElement("link");
-    link.rel = "icon";
-    link.href = periods[0].icon.replace("medium", "small");
-    head.appendChild(link);
+    // Create a column for each day
+    for (const [date, dayPeriods] of Object.entries(days)) 
+    {
+        // Create a column container for the day
+        const dayColumn = document.createElement("div");
+        dayColumn.className = "day-column";
+
+        // Add a header for the day
+        const dayHeader = document.createElement("h2");
+        dayHeader.className = "day-header";
+        const formattedHeader = new Date(dayPeriods[0].startTime).toLocaleDateString([], {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+        });
+        dayHeader.textContent = formattedHeader;
+        dayColumn.appendChild(dayHeader);
+
+        // Add hourly cards for the day
+        dayPeriods.forEach((element) => 
+        {
+            const div = document.createElement("div");
+            div.className = "card";
+
+            const h3 = document.createElement("h3");
+            const img = document.createElement("img");
+            const p = document.createElement("p");
+
+            const icon = element.icon.replace("medium", "large");
+
+            img.setAttribute("src", icon);
+            img.setAttribute("alt", element.shortForecast);
+
+            const localTime = new Date(element.startTime).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true,
+            });
+
+            h3.textContent = localTime;
+            p.textContent = `${element.shortForecast}, Temp: ${element.temperature}°${element.temperatureUnit}`;
+
+            div.appendChild(h3);
+            div.appendChild(img);
+            div.appendChild(p);
+
+            dayColumn.appendChild(div);
+        });
+
+        // Append the day's column to the card container
+        cardContainer.appendChild(dayColumn);
+    }
 }
