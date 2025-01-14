@@ -33,7 +33,6 @@ body {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-
 .day-header {
     font-size: 1.5em;
     font-weight: bold;
@@ -48,7 +47,7 @@ body {
     align-items: center;
     border: 1px solid #ddd;
     padding: 10px;
-    margin: 10px 5px;
+    margin: 10px 15px;
     border-radius: 8px;
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
