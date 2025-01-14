@@ -10,12 +10,14 @@
     overflow-x: auto;
     padding: 10px;
     gap: 20px;
+    background-color: lightblue; /* Debugging */
+    box-sizing: border-box; /* Ensure padding doesn't affect width */
 }
 
 .day-column {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Align items to the top, cutting off early if not filled */
+    align-items: center;
     border: 1px solid #ccc;
     padding: 10px;
     padding-left: 15px;
@@ -23,8 +25,10 @@
     border-radius: 8px;
     background-color: #f9f9f9;
     min-width: 200px;
+    flex: 0 0 auto; /* Prevent columns from shrinking */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+
 
 .day-header {
     font-size: 1.5em;
