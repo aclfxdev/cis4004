@@ -36,43 +36,71 @@ p {
     text-shadow: 2px 2px 5px black;
 }
 
-#card-container{
+.container {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
 }
 
-.card {
-    display: inline-block;
+#card-container {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
     padding: 10px;
-    margin: 10px;
-    width: 340px;
-    height: 340px;
-    border: 1px solid rgb(60, 30, 85);
-    border-radius: 10px;
-    box-shadow: 2px 2px 5px rgb(120, 120, 170);
-    background: linear-gradient(
-        rgb(240, 240, 255),
-        rgb(180, 180, 255),
-        rgb(120, 120, 170)
-    );
+    gap: 20px;
 }
 
-.card h2, p {
-    text-align: center;
-    text-wrap: wrap;
+.day-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    min-width: 200px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.day-header {
+    font-size: 1.5em;
     font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+    color: #333;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.card h3 {
+    font-size: 1em;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.card p {
+    font-size: 0.9em;
+    text-align: center;
+    color: #555;
 }
 
 .card img {
-    display: block;
-    width: 50%;
-    object-fit: cover;
-    border-radius: 10px;
-    margin: auto;
-    box-shadow: 2px 2px 5px gray;
+    width: 50px;
+    height: 50px;
+    margin-bottom: 5px;
 }
+
 
 // Roboto font identifier.
 .roboto-font-user {
@@ -82,12 +110,4 @@ p {
   font-style: normal;
   font-variation-settings:
     "wdth" 100;
-}
-
-// Styling day headers for forecasts.
-.day-header {
-    font-size: 1.5em;
-    font-weight: bold;
-    margin: 20px 0 10px;
-    color: #333;
 }
