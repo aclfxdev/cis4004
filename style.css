@@ -7,12 +7,11 @@
 #card-container {
     display: flex;
     flex-wrap: nowrap;
-    align-items: flex-start; /* Align columns to the top */
     overflow-x: auto;
     padding: 10px;
     gap: 20px;
     background-color: lightblue; /* Optional for debugging */
-    box-sizing: border-box;
+    box-sizing: border-box; /* Ensure padding doesn't affect width */
 }
 
 .day-column {
@@ -26,9 +25,7 @@
     border-radius: 8px;
     background-color: #f9f9f9;
     min-width: 200px;
-    max-height: 400px; /* Limit height to cut off early */
-    flex: 0 0 auto; /* Prevent columns from stretching */
-    overflow-y: auto; /* Add vertical scrolling for excess content */
+    flex: 0 0 auto; /* Prevent columns from shrinking */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
