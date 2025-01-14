@@ -51,23 +51,20 @@ async function getEndpoints(latitude, longitude) {
         const url = `https://api.weather.gov/points/${latitude},${longitude}`;
         const data = await fetchWithUserAgent(url);
 
-        // Store office and grid points from data
-        const office = data.properties.gridId;
-        const gridX = data.properties.gridX;
-        const gridY = data.properties.gridY;
+        // Store hourly forecast URL from data
+        const hourlyForecastUrl = data.properties.forecastHourly;
 
-        // Fetch weather forecast
-        getForecast(office, gridX, gridY);
+        // Fetch hourly weather forecast
+        getForecast(hourlyForecastUrl);
     } catch (error) {
         console.error(`%c${error.message}`, "color: red");
     }
 }
 
 // Weather.gov forecast API function
-async function getForecast(office, gridX, gridY) {
+async function getForecast(hourlyForecastUrl) {
     try {
-        const url = `https://api.weather.gov/gridpoints/${office}/${gridX},${gridY}/forecast`;
-        const data = await fetchWithUserAgent(url);
+        const data = await fetchWithUserAgent(hourlyForecastUrl);
 
         // Store periods from data
         const periods = data.properties.periods;
@@ -83,6 +80,7 @@ async function getForecast(office, gridX, gridY) {
 function createWeatherCards(periods) {
     // Store the card container div from index.html
     const cardContainer = document.getElementById("card-container");
+    cardContainer.innerHTML = ""; // Clear existing cards if any
 
     // Create a card for each element in the periods array
     periods.forEach((element) => {
@@ -103,8 +101,8 @@ function createWeatherCards(periods) {
         img.setAttribute("alt", element.shortForecast);
 
         // Set the text content for the card title and forecast
-        h2.textContent = element.name;
-        p.textContent = element.shortForecast;
+        h2.textContent = `${element.startTime.split("T")[1].slice(0, 5)}: ${element.name}`;
+        p.textContent = `${element.shortForecast}, Temp: ${element.temperature}°${element.temperatureUnit}`;
 
         // Append the title, image, and forecast to the card div
         div.appendChild(h2);
