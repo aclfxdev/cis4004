@@ -10,8 +10,8 @@ body {
 
 #card-container {
     display: flex;
-    flex-wrap: nowrap;
-    /*overflow-x: auto;*/
+    /*flex-wrap: nowrap;
+    overflow-x: auto;*/
     padding: 10px;
     gap: 20px;
     background-color: lightgrey;
