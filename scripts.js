@@ -20,6 +20,51 @@ function fetchWithUserAgent(url) {
         });
 }
 
+// Dark Mode Functions
+
+// Applies the chosen theme by toggling a class on the document body
+function applyTheme(theme) {
+    if (theme === "dark") {
+        document.body.classList.add("dark-mode");
+    } else {
+        document.body.classList.remove("dark-mode");
+    }
+}
+
+// Initialize theme based on localStorage or system preferences
+function initTheme() {
+    const storedTheme = localStorage.getItem("theme");
+    if (storedTheme) {
+        applyTheme(storedTheme);
+    } else {
+        // Use system preference if no stored preference exists
+        const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        applyTheme(prefersDark ? "dark" : "light");
+    }
+}
+
+// Toggle theme and store the user preference
+function toggleTheme() {
+    if (document.body.classList.contains("dark-mode")) {
+        document.body.classList.remove("dark-mode");
+        localStorage.setItem("theme", "light");
+    } else {
+        document.body.classList.add("dark-mode");
+        localStorage.setItem("theme", "dark");
+    }
+}
+
+// Wait for the DOM to load to initialize the theme and attach toggle events
+document.addEventListener("DOMContentLoaded", function() {
+    initTheme();
+
+    // Assume there is a toggle switch with id "theme-toggle" in your HTML
+    const toggleSwitch = document.getElementById("theme-toggle");
+    if (toggleSwitch) {
+        toggleSwitch.addEventListener("change", toggleTheme);
+    }
+});
+
 // Get visitor's Geolocation data function
 if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
