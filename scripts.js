@@ -88,79 +88,43 @@ async function getForecast(hourlyForecastUrl) {
     }
 }
 
-// Creating the weather cards function
-function createWeatherCards(periods) 
-{
+// Creating the weather cards function (horizontal layout)
+function createWeatherCards(periods) {
     // Store the card container div from index.html
     const cardContainer = document.getElementById("card-container");
     cardContainer.innerHTML = ""; // Clear existing content
 
-    // Group periods by day
-    const days = {};
-    periods.forEach((element) => 
-    {
-        const date = new Date(element.startTime).toLocaleDateString([], { 
-            month: '2-digit', 
-            day: '2-digit', 
-            year: 'numeric' 
+    // Iterate over each forecast period and create a card
+    periods.forEach((element) => {
+        const div = document.createElement("div");
+        div.className = "card";
+
+        const h3 = document.createElement("h3");
+        const img = document.createElement("img");
+        const p = document.createElement("p");
+
+        const icon = element.icon.replace("medium", "large");
+        img.setAttribute("src", icon);
+        img.setAttribute("alt", element.shortForecast);
+
+        // Format the start time for display
+        const localTime = new Date(element.startTime).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
         });
-        if (!days[date]) 
-        {
-            days[date] = [];
-        }
-        days[date].push(element);
+        h3.textContent = localTime;
+        p.textContent = `${element.shortForecast}, Temp: ${element.temperature}°${element.temperatureUnit}`;
+
+        div.appendChild(h3);
+        div.appendChild(img);
+        div.appendChild(p);
+
+        // Append the card to the container
+        cardContainer.appendChild(div);
     });
 
-    // Create a column for each day
-    for (const [date, dayPeriods] of Object.entries(days)) 
-    {
-        // Create a column container for the day
-        const dayColumn = document.createElement("div");
-        dayColumn.className = "day-column";
-
-        // Add a header for the day
-        const dayHeader = document.createElement("h2");
-        dayHeader.className = "day-header";
-        const formattedHeader = new Date(dayPeriods[0].startTime).toLocaleDateString([], {
-            weekday: 'short',
-            month: 'long',
-            day: 'numeric',
-        });
-        dayHeader.textContent = formattedHeader;
-        dayColumn.appendChild(dayHeader);
-
-        // Add hourly cards for the day
-        dayPeriods.forEach((element) => 
-        {
-            const div = document.createElement("div");
-            div.className = "card";
-
-            const h3 = document.createElement("h3");
-            const img = document.createElement("img");
-            const p = document.createElement("p");
-
-            const icon = element.icon.replace("medium", "large");
-
-            img.setAttribute("src", icon);
-            img.setAttribute("alt", element.shortForecast);
-
-            const localTime = new Date(element.startTime).toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true,
-            });
-
-            h3.textContent = localTime;
-            p.textContent = `${element.shortForecast}, Temp: ${element.temperature}°${element.temperatureUnit}`;
-
-            div.appendChild(h3);
-            div.appendChild(img);
-            div.appendChild(p);
-
-            dayColumn.appendChild(div);
-        });
-
-        // Append the day's column to the card container
-        cardContainer.appendChild(dayColumn);
-    }
+    // Optional: Set container style to display items in a row.
+    // Ensure your CSS includes something like:
+    // #card-container { display: flex; flex-wrap: nowrap; overflow-x: auto; }
 }
