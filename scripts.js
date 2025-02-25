@@ -69,8 +69,20 @@ async function getForecast(hourlyForecastUrl) {
         // Store periods from data
         const periods = data.properties.periods;
 
-        // Create weather cards on page
-        createWeatherCards(periods);
+        // Calculate current time and the cutoff time 24 hours later
+        const now = new Date();
+        const cutoff = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+        // Filter forecast periods to include only those starting between now and the next 24 hours
+        const filteredPeriods = periods.filter(period => {
+            const periodStart = new Date(period.startTime);
+            return periodStart >= now && periodStart <= cutoff;
+        });
+
+        console.log("Filtered periods:", filteredPeriods);
+
+        // Create weather cards on page using filtered data
+        createWeatherCards(filteredPeriods);
     } catch (error) {
         console.error(`%c${error.message}`, "color: red");
     }
