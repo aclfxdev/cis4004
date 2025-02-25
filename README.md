@@ -5,5 +5,5 @@ Create a full-stack web application on weather-related information for UCF's CIS
 
 METHODOLOGY:
 - Github.io for commits and changes.
-- Microsoft Azure for hosting full-stack as we need back-end support (which github pages doesn't support unfortunately, unless you use a bunch of magic :/ ).
+- Microsoft Azure for hosting full-stack as we need back-end support (which github pages doesn't support unfortunately, unless you use a bunch of magic :/ ). Also allows us to do authentication.
 - Weather.gov for forecast API (thank you US gov for having this).
