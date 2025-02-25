@@ -69,20 +69,8 @@ async function getForecast(hourlyForecastUrl) {
         // Store periods from data
         const periods = data.properties.periods;
 
-        // Calculate current time and the cutoff time 24 hours later
-        const now = new Date();
-        const cutoff = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-
-        // Filter forecast periods to include only those starting between now and the next 24 hours
-        const filteredPeriods = periods.filter(period => {
-            const periodStart = new Date(period.startTime);
-            return periodStart >= now && periodStart <= cutoff;
-        });
-
-        console.log("Filtered periods:", filteredPeriods);
-
-        // Create weather cards on page using filtered data
-        createWeatherCards(filteredPeriods);
+        // Create weather cards on page
+        createWeatherCards(periods);
     } catch (error) {
         console.error(`%c${error.message}`, "color: red");
     }
@@ -115,4 +103,52 @@ function createWeatherCards(periods)
     for (const [date, dayPeriods] of Object.entries(days)) 
     {
         // Create a column container for the day
-        const dayColumn = document.create
+        const dayColumn = document.createElement("div");
+        dayColumn.className = "day-column";
+
+        // Add a header for the day
+        const dayHeader = document.createElement("h2");
+        dayHeader.className = "day-header";
+        const formattedHeader = new Date(dayPeriods[0].startTime).toLocaleDateString([], {
+            weekday: 'short',
+            month: 'long',
+            day: 'numeric',
+        });
+        dayHeader.textContent = formattedHeader;
+        dayColumn.appendChild(dayHeader);
+
+        // Add hourly cards for the day
+        dayPeriods.forEach((element) => 
+        {
+            const div = document.createElement("div");
+            div.className = "card";
+
+            const h3 = document.createElement("h3");
+            const img = document.createElement("img");
+            const p = document.createElement("p");
+
+            const icon = element.icon.replace("medium", "large");
+
+            img.setAttribute("src", icon);
+            img.setAttribute("alt", element.shortForecast);
+
+            const localTime = new Date(element.startTime).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true,
+            });
+
+            h3.textContent = localTime;
+            p.textContent = `${element.shortForecast}, Temp: ${element.temperature}°${element.temperatureUnit}`;
+
+            div.appendChild(h3);
+            div.appendChild(img);
+            div.appendChild(p);
+
+            dayColumn.appendChild(div);
+        });
+
+        // Append the day's column to the card container
+        cardContainer.appendChild(dayColumn);
+    }
+}
