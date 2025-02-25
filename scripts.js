@@ -123,8 +123,4 @@ function createWeatherCards(periods) {
         // Append the card to the container
         cardContainer.appendChild(div);
     });
-
-    // Optional: Set container style to display items in a row.
-    // Ensure your CSS includes something like:
-    // #card-container { display: flex; flex-wrap: nowrap; overflow-x: auto; }
 }
