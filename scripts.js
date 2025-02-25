@@ -31,15 +31,18 @@ function applyTheme(theme) {
     }
 }
 
-// Initialize theme based on localStorage or system preferences
+// Initialize theme based on localStorage or system preferences,
+// and set the toggle switch position accordingly.
 function initTheme() {
     const storedTheme = localStorage.getItem("theme");
-    if (storedTheme) {
-        applyTheme(storedTheme);
-    } else {
-        // Use system preference if no stored preference exists
-        const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-        applyTheme(prefersDark ? "dark" : "light");
+    const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const theme = storedTheme ? storedTheme : (prefersDark ? "dark" : "light");
+    applyTheme(theme);
+    
+    // Set the toggle switch state (if it exists)
+    const toggleSwitch = document.getElementById("theme-toggle");
+    if (toggleSwitch) {
+        toggleSwitch.checked = theme === "dark";
     }
 }
 
@@ -58,7 +61,7 @@ function toggleTheme() {
 document.addEventListener("DOMContentLoaded", function() {
     initTheme();
 
-    // Assume there is a toggle switch with id "theme-toggle" in your HTML
+    // Attach event listener to the toggle switch (if it exists)
     const toggleSwitch = document.getElementById("theme-toggle");
     if (toggleSwitch) {
         toggleSwitch.addEventListener("change", toggleTheme);
