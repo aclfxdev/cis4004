@@ -177,7 +177,7 @@ function createWeatherCards(periods) {
     // Iterate over each forecast period and create a card
     periods.forEach((element) => {
         const div = document.createElement("div");
-        div.className = "card";
+        div.className = "card dark-mode";
 
         const h3 = document.createElement("h3");
         // Instead of an <img>, we'll create an <i> element for the icon.
