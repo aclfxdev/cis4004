@@ -19,6 +19,7 @@ body {
   #card-container {
     flex-direction: column;
     overflow-x: visible;
+    align-items: center;  /* Center cards horizontally */
   }
 
   .card {
@@ -27,13 +28,14 @@ body {
     align-items: center;
     border: 1px solid #ddd;
     padding: 5px;
-    margin: 10px 5px;
+    margin: 10px auto;  /* Auto left/right margins center the card */
     border-radius: 8px;
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    width: 25%;
+    width: 90%;  /* Increase width for mobile screens */
   }
 }
+
 
 .day-header {
     font-size: 1.5em;
