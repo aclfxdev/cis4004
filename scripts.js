@@ -1,5 +1,37 @@
 // MAIN SCRIPTS FILE.
 
+// --- Weather Icons Mapping ---
+// Maps keywords from the forecast condition to weather-icons CSS classes.
+// You can expand this mapping as needed.
+const weatherIconClassMap = {
+    "Clear": "wi-day-sunny",
+    "Sunny": "wi-day-sunny",
+    "Mostly Sunny": "wi-day-sunny-overcast",
+    "Partly Cloudy": "wi-day-cloudy",
+    "Mostly Cloudy": "wi-cloudy",
+    "Cloudy": "wi-cloudy",
+    "Overcast": "wi-cloudy",
+    "Rain": "wi-day-rain",
+    "Showers": "wi-day-showers",
+    "Thunderstorm": "wi-day-thunderstorm",
+    "Snow": "wi-day-snow",
+    "Sleet": "wi-sleet",
+    "Fog": "wi-fog"
+    // Add additional mappings as needed.
+};
+
+// Returns a weather-icons CSS class based on the condition.
+function getWeatherIconClass(condition) {
+    // Loop through mapping keys and check if the condition includes the key.
+    for (const key in weatherIconClassMap) {
+        if (condition.indexOf(key) !== -1) {
+            return weatherIconClassMap[key];
+        }
+    }
+    // Default icon if no match is found.
+    return "wi-na";
+}
+
 // Define the function to fetch with User-Agent
 function fetchWithUserAgent(url) {
     const headers = {
@@ -148,12 +180,16 @@ function createWeatherCards(periods) {
         div.className = "card";
 
         const h3 = document.createElement("h3");
-        const img = document.createElement("img");
+        // Instead of an <img>, we'll create an <i> element for the icon.
+        const iconElem = document.createElement("i");
         const p = document.createElement("p");
 
-        const icon = element.icon.replace("medium", "large");
-        img.setAttribute("src", icon);
-        img.setAttribute("alt", element.shortForecast);
+        // Determine the icon class based on the forecast condition.
+        const iconClass = getWeatherIconClass(element.shortForecast);
+        // Add the weather-icons base class and the mapped class.
+        iconElem.className = `wi ${iconClass}`;
+        // Optionally, adjust icon size via a CSS class (e.g., wi-3x)
+        iconElem.classList.add("wi-3x");
 
         // Format the start time for display
         const localTime = new Date(element.startTime).toLocaleTimeString([], {
@@ -165,7 +201,7 @@ function createWeatherCards(periods) {
         p.innerHTML = `${element.shortForecast}<br>${element.temperature}°${element.temperatureUnit}`;
 
         div.appendChild(h3);
-        div.appendChild(img);
+        div.appendChild(iconElem);
         div.appendChild(p);
 
         // Append the card to the container
