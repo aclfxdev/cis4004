@@ -76,23 +76,16 @@ body {
     margin-bottom: 5px;
 }
 
-/* Dark mode styles */
-body.dark-mode {
-    background-color: #121212;
-    color: #e0e0e0;
+/* Dark mode theme */
+body.dark-mode .card {
+  background-color: #1e1e1e; /* darker background */
+  border-color: #333;       /* darker border */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-.card.dark-mode {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border: 1px solid #636363;
-    padding: 5px;
-    margin: 10px 5px;
-    border-radius: 8px;
-    background-color: #333333;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    min-width: 5%;
+body.dark-mode .card h3,
+body.dark-mode .card p {
+  color: #e0e0e0; /* light text for dark backgrounds */
 }
 
 /* The switch container */
