@@ -162,7 +162,7 @@ function createWeatherCards(periods) {
             hour12: true,
         });
         h3.textContent = localTime;
-        p.textContent = `${element.shortForecast}, Temp: ${element.temperature}°${element.temperatureUnit}`;
+        p.textContent = `${element.shortForecast}\nTemp: ${element.temperature}°${element.temperatureUnit}`;
 
         div.appendChild(h3);
         div.appendChild(img);
