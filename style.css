@@ -147,7 +147,7 @@ body.dark-mode .card p {
 }
 
 input:checked + .slider {
-  background-color: #2196F3;
+  background-color: #21f3c5; /* light green color */
 }
 
 input:checked + .slider:before {
