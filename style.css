@@ -34,6 +34,18 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     width: 50%;
   }
+
+  /* Mobile dark mode overrides */
+  body.dark-mode .card {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  body.dark-mode .card h3,
+  body.dark-mode .card p {
+    color: #e0e0e0 !important;
+  }
 }
 
 
