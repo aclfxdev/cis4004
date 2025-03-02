@@ -131,7 +131,7 @@ body.dark-mode .card p {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #242424; /* dark grey color */
+  background-color: #363636; /* dark grey color */
   transition: .4s;
 }
 
