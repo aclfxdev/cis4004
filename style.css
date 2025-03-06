@@ -43,8 +43,32 @@ body {
         border-radius: 8px;
         background-color: #fff;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        width: 90%;
+        width: 35% !important;
     }
+	
+	/* Card Styling */
+	.card h3 {
+		font-size: 1em;
+		margin-bottom: 0.5rem !important;
+		color: #333;
+	}
+
+	.card p {
+		font-size: 0.9em;
+		text-align: center;
+		color: #555;
+		margin-bottom: 0.1rem !important;
+	}
+
+	.card img {
+		width: 50px;
+		height: 50px;
+		margin-bottom: 5px;
+	}
+
+	.card .wi {
+		margin-bottom: 0.5rem !important;
+	}
 
     /* Mobile dark mode overrides */
     body.dark-mode {
