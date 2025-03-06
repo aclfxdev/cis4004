@@ -168,16 +168,24 @@ async function getForecast(hourlyForecastUrl) {
     }
 }
 
-// Creating the weather cards function (horizontal layout)
+// Creating the weather cards function (two rows layout)
 function createWeatherCards(periods) {
-    // Store the card container div from index.html
-    const cardContainer = document.getElementById("card-container");
-    cardContainer.innerHTML = ""; // Clear existing content
+    // Get the two row containers
+    const row1Container = document.getElementById("row-1");
+    const row2Container = document.getElementById("row-2");
 
-    // Iterate over each forecast period and create a card
-    periods.forEach((element) => {
+    // Clear any existing content
+    row1Container.innerHTML = "";
+    row2Container.innerHTML = "";
+
+    // Split the periods into two groups (first 12 and last 12)
+    const firstHalf = periods.slice(0, 12);
+    const secondHalf = periods.slice(12, 24);
+
+    // Function to create a card for a forecast period
+    function createCard(element) {
         const div = document.createElement("div");
-        div.className = "card dark-mode";
+        div.className = "card";
 
         const h3 = document.createElement("h3");
         // Instead of an <img>, we'll create an <i> element for the icon.
@@ -204,7 +212,16 @@ function createWeatherCards(periods) {
         div.appendChild(iconElem);
         div.appendChild(p);
 
-        // Append the card to the container
-        cardContainer.appendChild(div);
+        return div;
+    }
+
+    // Append first half to the first row
+    firstHalf.forEach(element => {
+        row1Container.appendChild(createCard(element));
+    });
+
+    // Append second half to the second row
+    secondHalf.forEach(element => {
+        row2Container.appendChild(createCard(element));
     });
 }
