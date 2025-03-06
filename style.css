@@ -3,21 +3,30 @@ body {
 }
 
 .container {
-    /*display: flex;*/
+    display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-/* Desktop card container */
+/* Card container now arranged in two rows */
 #card-container {
     display: flex;
-    flex-wrap: nowrap;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+/* Each forecast row uses flexbox to display the cards evenly */
+.forecast-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
     overflow-x: auto;
 }
 
 /* Mobile layout: stack cards vertically */
 @media (max-width: 768px) {
-  #card-container {
+  .forecast-row {
     flex-direction: column;
     overflow-x: visible;
     align-items: center; /* Center the cards horizontally */
