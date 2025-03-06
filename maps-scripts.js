@@ -1,4 +1,4 @@
-// --- Weather Icons Mapping ---
+// --- Weather Icons Mapping ----
 const weatherIconClassMap = {
   "Clear": "wi-day-sunny",
   "Sunny": "wi-day-sunny",
