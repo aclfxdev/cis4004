@@ -43,8 +43,7 @@ body {
         border-radius: 8px;
         background-color: #fff;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        width: 50%;
-        min-width: 5%;
+        width: 90%;
     }
 
     /* Mobile dark mode overrides */
@@ -84,7 +83,7 @@ body {
     align-items: center;
     border: 1px solid #ddd;
     padding: 15px;
-    margin: 10px 5px;
+    margin: 0.5rem 0.25rem;
     border-radius: 8px;
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -101,7 +100,7 @@ body {
     font-size: 0.9em;
     text-align: center;
     color: #555;
-	margin-bottom: 1rem;
+	margin-bottom: 0.5rem;
 }
 
 .card img {
