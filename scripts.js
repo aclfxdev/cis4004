@@ -206,7 +206,18 @@ function createWeatherCards(periods) {
             hour12: true,
         });
         h3.textContent = localTime;
-        p.innerHTML = `${element.shortForecast}<br>${element.temperature}°${element.temperatureUnit}`;
+
+        // Format the temperature to include Celsius if Fahrenheit.
+        let tempText;
+        if (element.temperatureUnit === "F") {
+            const fahrenheit = element.temperature;
+            const celsius = Math.round((fahrenheit - 32) * 5 / 9);
+            tempText = `${fahrenheit}°F (${celsius}°C)`;
+        } else {
+            tempText = `${element.temperature}°${element.temperatureUnit}`;
+        }
+
+        p.innerHTML = `${element.shortForecast}<br>${tempText}`;
 
         div.appendChild(h3);
         div.appendChild(iconElem);

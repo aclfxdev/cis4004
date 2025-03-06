@@ -64,6 +64,10 @@ body {
     body.dark-mode .card p {
         color: #e0e0e0 !important;
     }
+	/* NEW: Ensure weather icons display in light color in dark mode */
+	body.dark-mode .wi {
+    	color: #e0e0e0 !important;
+	}	
 }
 
 .day-header {
@@ -89,7 +93,7 @@ body {
 
 .card h3 {
     font-size: 1em;
-    margin-bottom: 5px;
+    margin-bottom: 1rem;
     color: #333;
 }
 
@@ -97,12 +101,17 @@ body {
     font-size: 0.9em;
     text-align: center;
     color: #555;
+	margin-bottom: 1rem;
 }
 
 .card img {
     width: 50px;
     height: 50px;
     margin-bottom: 5px;
+}
+
+.card .wi {
+	margin-bottom: 2rem;
 }
 
 /* Dark mode styles for desktop */
@@ -119,6 +128,11 @@ body.dark-mode .card {
 
 body.dark-mode .card h3,
 body.dark-mode .card p {
+    color: #e0e0e0 !important;
+}
+
+/* Ensure weather icons display in light color in dark mode */
+body.dark-mode .wi {
     color: #e0e0e0 !important;
 }
 
