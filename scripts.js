@@ -23,7 +23,7 @@ function checkAuthStatus() {
                 loginBtn.style.display = "none";
                 logoutBtn.style.display = "inline-block";
 
-                // Store login status in localStorage to sync across all pages
+                // Store login status in localStorage to sync across pages
                 localStorage.setItem("isLoggedIn", "true");
                 localStorage.setItem("userID", user.user_id || "User");
 
@@ -92,7 +92,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (logoutBtn) {
         logoutBtn.addEventListener("click", () => {
-            window.location.href = "/.auth/logout?post_logout_redirect_uri=" + encodeURIComponent(getRedirectUrl());
+            localStorage.removeItem("isLoggedIn");
+            localStorage.removeItem("userID");
+            window.location.href = "/.auth/logout?post_logout_redirect_uri=" + encodeURIComponent("index.html");
         });
     }
 
