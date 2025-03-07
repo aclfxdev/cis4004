@@ -106,6 +106,19 @@ async function getEndpoints(latitude, longitude) {
     try {
         const url = `https://api.weather.gov/points/${latitude},${longitude}`;
         const data = await fetchWithUserAgent(url);
+        
+        // NEW: Extract nearest city and state from relativeLocation
+        const { city, state } = data.properties.relativeLocation.properties;
+        // Extract the radar station code
+        const stationCode = data.properties.radarStation;
+        
+        // Update the location-info div with this information
+        const locationInfoDiv = document.getElementById("location-info");
+        if (locationInfoDiv) {
+            locationInfoDiv.textContent = `Nearest City: ${city}, ${state} | Station: ${stationCode}`;
+        }
+        
+        // Retrieve the hourly forecast URL
         const hourlyForecastUrl = data.properties.forecastHourly;
         getForecast(hourlyForecastUrl);
     } catch (error) {
