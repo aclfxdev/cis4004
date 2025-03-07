@@ -1,6 +1,6 @@
 // ================= Authentication Functions =================
 
-// Function to check authentication status
+// Function to check authentication status across all pages
 function checkAuthStatus() {
     fetch('/.auth/me')
         .then(response => {
@@ -23,9 +23,12 @@ function checkAuthStatus() {
                 loginBtn.style.display = "none";
                 logoutBtn.style.display = "inline-block";
 
-                // Store login status in localStorage for cross-page sync
+                // Store login status in localStorage to sync across all pages
                 localStorage.setItem("isLoggedIn", "true");
                 localStorage.setItem("userID", user.user_id || "User");
+
+                // Ensure the login status updates correctly
+                syncLoginStatus();
             } else {
                 accountStatus.innerText = "Not signed in";
                 loginBtn.style.display = "inline-block";
@@ -66,12 +69,15 @@ function syncLoginStatus() {
 
 // Store last visited page before login
 function storeLastPage() {
+    console.log("Storing last page:", window.location.href);
     localStorage.setItem("lastPage", window.location.href);
 }
 
 // Get the last visited page for redirection
 function getRedirectUrl() {
-    return localStorage.getItem("lastPage") || "index.html";
+    let lastPage = localStorage.getItem("lastPage") || "index.html";
+    console.log("Redirecting back to:", lastPage);
+    return lastPage;
 }
 
 // Modify login and logout buttons to store last page before redirecting
@@ -90,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Sync login status and check authentication
+    // Run login sync and authentication check
     syncLoginStatus();
     checkAuthStatus();
 });
@@ -143,8 +149,6 @@ function getCookie(cname) {
     }
     return "";
 }
-
-
 
 // ================= Google Maps Integration =================
 let map;
