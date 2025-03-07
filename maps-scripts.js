@@ -167,7 +167,7 @@ function initMap() {
         const clickedLocation = event.latLng;
         if (marker) {
             // Update the position of the existing marker using AdvancedMarkerElement
-            marker.setOptions({ position: clickedLocation });
+            marker.position = clickedLocation;
         } else {
             // Create a new marker using AdvancedMarkerElement
             marker = new google.maps.marker.AdvancedMarkerElement({
