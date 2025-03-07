@@ -1,9 +1,13 @@
 /* Set up the map container size */
 @media (max-width: 768px) {
 	#map {
-		height: 20rem;
-		width: 80%;
+		height: 30rem !important;
+		width: 90% !important;
 		margin-bottom: 1rem;
+	}
+	
+	h4 {
+		font-size: 3vw !important;
 	}
 }
 
