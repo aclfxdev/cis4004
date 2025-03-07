@@ -81,7 +81,7 @@ function getWeatherIconClass(condition) {
     return "wi-na";
 }
 
-// Define function to fetch with User-Agent for weather.gov API requests
+// Function to fetch with User-Agent for weather.gov API requests
 function fetchWithUserAgent(url) {
     const headers = {
         "User-Agent": "CIS-4004 Weather Forecasting (ch797590@ucf.edu / ja939451@ucf.edu)",
@@ -198,7 +198,8 @@ function initMap() {
     const initialLocation = { lat: 39.8283, lng: -98.5795 };
     map = new google.maps.Map(document.getElementById("map"), {
         center: initialLocation,
-        zoom: 4
+        zoom: 4,
+        mapId: "4a26c61826571d78"
     });
 
     map.addListener("click", (event) => {
