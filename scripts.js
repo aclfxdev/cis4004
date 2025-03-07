@@ -49,37 +49,42 @@ function fetchWithUserAgent(url) {
 // ================= Authentication Functions =================
 // Function to check authentication status across all pages
 function checkAuthStatus() {
-    fetch('/.auth/me')
-        .then(response => response.json())
-        .then(data => {
-            let loginBtn = document.getElementById("login-btn");
-            let logoutBtn = document.getElementById("logout-btn");
-            let accountStatus = document.getElementById("account-status");
+    document.addEventListener("DOMContentLoaded", () => {
+        let loginBtn = document.getElementById("login-btn");
+        let logoutBtn = document.getElementById("logout-btn");
+        let accountStatus = document.getElementById("account-status");
 
-            if (!loginBtn || !logoutBtn || !accountStatus) {
-                console.error("Auth elements not found in the DOM.");
-                return;
-            }
+        // 🔹 Fix: Retry if elements are not found
+        if (!loginBtn || !logoutBtn || !accountStatus) {
+            console.error("Auth elements not found, retrying...");
+            setTimeout(checkAuthStatus, 500);
+            return;
+        }
 
-            if (data.length > 0) {
-                const user = data[0];
-                accountStatus.innerText = "Signed in as " + (user.user_id || "User");
-                loginBtn.style.display = "none";
-                logoutBtn.style.display = "inline-block";
-            } else {
-                accountStatus.innerText = "Not signed in";
-                loginBtn.style.display = "inline-block";
-                logoutBtn.style.display = "none";
-            }
-        })
-        .catch(error => {
-            console.error("Error checking login status:", error);
-            let accountStatus = document.getElementById("account-status");
-            if (accountStatus) {
+        fetch('/.auth/me')
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    const user = data[0];
+                    accountStatus.innerText = "Signed in as " + (user.user_id || "User");
+                    loginBtn.style.display = "none";
+                    logoutBtn.style.display = "inline-block";
+                } else {
+                    accountStatus.innerText = "Not signed in";
+                    loginBtn.style.display = "inline-block";
+                    logoutBtn.style.display = "none";
+                }
+            })
+            .catch(error => {
+                console.error("Error checking login status:", error);
                 accountStatus.innerText = "Error checking login status";
-            }
-        });
+            });
+    });
 }
+
+// 🔹 Fix: Ensure the function runs when the DOM is fully loaded
+checkAuthStatus();
+
 
 // Run authentication check on page load after DOM is fully loaded
 document.addEventListener("DOMContentLoaded", checkAuthStatus);
