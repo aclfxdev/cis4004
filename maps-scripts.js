@@ -1,4 +1,25 @@
-/* Dark Mode Functionality for Forecast Map */
+// Cookie helper functions
+function setCookie(cname, cvalue, exdays) {
+    const d = new Date();
+    d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
+    const expires = "expires=" + d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+    const name = cname + "=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(";");
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i].trim();
+        if (c.indexOf(name) === 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+// Dark mode functions using cookies
 function applyTheme(theme) {
     if (theme === "dark") {
         document.body.classList.add("dark-mode");
@@ -8,9 +29,14 @@ function applyTheme(theme) {
 }
 
 function initTheme() {
-    const storedTheme = localStorage.getItem("theme");
-    const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const theme = storedTheme ? storedTheme : (prefersDark ? "dark" : "light");
+    const themeCookie = getCookie("theme");
+    let theme;
+    if (themeCookie) {
+        theme = themeCookie;
+    } else {
+        const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        theme = prefersDark ? "dark" : "light";
+    }
     applyTheme(theme);
     const toggleSwitch = document.getElementById("theme-toggle");
     if (toggleSwitch) {
@@ -18,16 +44,25 @@ function initTheme() {
         toggleSwitch.addEventListener("change", function () {
             if (document.body.classList.contains("dark-mode")) {
                 document.body.classList.remove("dark-mode");
-                localStorage.setItem("theme", "light");
+                setCookie("theme", "light", 30);
             } else {
                 document.body.classList.add("dark-mode");
-                localStorage.setItem("theme", "dark");
+                setCookie("theme", "dark", 30);
             }
         });
     }
 }
 
 document.addEventListener("DOMContentLoaded", initTheme);
+
+// Helper function to create a pin for AdvancedMarkerElement
+function createPin(color = "#4285F4") {
+    const pinView = new google.maps.marker.PinView({
+        scale: 1,
+        background: color
+    });
+    return pinView.element;
+}
 
 /* Weather Icons Mapping */
 const weatherIconClassMap = {
@@ -58,8 +93,8 @@ function getWeatherIconClass(condition) {
 // Fetch with User-Agent for weather.gov API requests
 function fetchWithUserAgent(url) {
     const headers = {
-        'User-Agent': 'CIS-4004 Weather Forecasting (email@example.com)',
-        'Accept': 'application/json',
+        "User-Agent": "CIS-4004 Weather Forecasting (email@example.com)",
+        "Accept": "application/json"
     };
     return fetch(url, { headers })
         .then(response => {
@@ -113,7 +148,6 @@ function createWeatherCards(periods) {
         div.className = "card";
         
         const h3 = document.createElement("h3");
-        // Create an icon element using weather-icons
         const iconElem = document.createElement("i");
         const p = document.createElement("p");
 
@@ -122,13 +156,12 @@ function createWeatherCards(periods) {
         iconElem.classList.add("wi-3x");
 
         const localTime = new Date(element.startTime).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
+            hour: "2-digit",
+            minute: "2-digit",
             hour12: true
         });
         h3.textContent = localTime;
 
-        // Format temperature with Fahrenheit and Celsius if needed.
         let tempText;
         if (element.temperatureUnit === "F") {
             const fahrenheit = element.temperature;
@@ -155,25 +188,22 @@ let map;
 let marker;
 
 function initMap() {
-    // Center map on the US by default
     const initialLocation = { lat: 39.8283, lng: -98.5795 };
     map = new google.maps.Map(document.getElementById("map"), {
         center: initialLocation,
         zoom: 4
     });
 
-    // When the map is clicked, place (or move) a marker and fetch forecast data.
     map.addListener("click", (event) => {
         const clickedLocation = event.latLng;
         if (marker) {
-            // Update the position of the existing marker using AdvancedMarkerElement
             marker.position = clickedLocation;
         } else {
-            // Create a new marker using AdvancedMarkerElement
             marker = new google.maps.marker.AdvancedMarkerElement({
                 position: clickedLocation,
                 map: map,
-                title: "Selected Location"
+                title: "Selected Location",
+                content: createPin("#4285F4")
             });
         }
         const lat = clickedLocation.lat();
@@ -181,65 +211,3 @@ function initMap() {
         getEndpoints(lat, lng);
     });
 }
-
-// Cookie helper functions
-function setCookie(cname, cvalue, exdays) {
-    const d = new Date();
-    d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
-    const expires = "expires=" + d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-}
-
-function getCookie(cname) {
-    const name = cname + "=";
-    const decodedCookie = decodeURIComponent(document.cookie);
-    const ca = decodedCookie.split(';');
-    for (let i = 0; i < ca.length; i++) {
-        let c = ca[i].trim();
-        if (c.indexOf(name) === 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return "";
-}
-
-// Updated dark mode functions using cookies
-function applyTheme(theme) {
-    if (theme === "dark") {
-        document.body.classList.add("dark-mode");
-    } else {
-        document.body.classList.remove("dark-mode");
-    }
-}
-
-function initTheme() {
-    // First, check cookie for dark mode preference
-    const themeCookie = getCookie("theme");
-    let theme;
-    if (themeCookie) {
-        theme = themeCookie;
-    } else {
-        // Fallback: use local preference
-        const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-        theme = prefersDark ? "dark" : "light";
-    }
-    applyTheme(theme);
-
-    // Set the state of the dark mode toggle if it exists
-    const toggleSwitch = document.getElementById("theme-toggle");
-    if (toggleSwitch) {
-        toggleSwitch.checked = theme === "dark";
-        toggleSwitch.addEventListener("change", function () {
-            if (document.body.classList.contains("dark-mode")) {
-                document.body.classList.remove("dark-mode");
-                setCookie("theme", "light", 30); // store for 30 days
-            } else {
-                document.body.classList.add("dark-mode");
-                setCookie("theme", "dark", 30);
-            }
-        });
-    }
-}
-
-document.addEventListener("DOMContentLoaded", initTheme);
-
