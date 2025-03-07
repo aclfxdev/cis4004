@@ -1,7 +1,6 @@
 // MAIN SCRIPTS FILE.
 
 // --- Weather Icons Mapping ---
-// Maps keywords from the forecast condition to weather-icons CSS classes.
 const weatherIconClassMap = {
     "Clear": "wi-day-sunny",
     "Sunny": "wi-day-sunny",
@@ -46,6 +45,44 @@ function fetchWithUserAgent(url) {
             throw error;
         });
 }
+
+// ================= Authentication Functions =================
+// Function to check authentication status across all pages
+function checkAuthStatus() {
+    fetch('/.auth/me')
+        .then(response => response.json())
+        .then(data => {
+            let loginBtn = document.getElementById("login-btn");
+            let logoutBtn = document.getElementById("logout-btn");
+            let accountStatus = document.getElementById("account-status");
+
+            if (!loginBtn || !logoutBtn || !accountStatus) {
+                console.error("Auth elements not found in the DOM.");
+                return;
+            }
+
+            if (data.length > 0) {
+                const user = data[0];
+                accountStatus.innerText = "Signed in as " + (user.user_id || "User");
+                loginBtn.style.display = "none";
+                logoutBtn.style.display = "inline-block";
+            } else {
+                accountStatus.innerText = "Not signed in";
+                loginBtn.style.display = "inline-block";
+                logoutBtn.style.display = "none";
+            }
+        })
+        .catch(error => {
+            console.error("Error checking login status:", error);
+            let accountStatus = document.getElementById("account-status");
+            if (accountStatus) {
+                accountStatus.innerText = "Error checking login status";
+            }
+        });
+}
+
+// Run authentication check on page load after DOM is fully loaded
+document.addEventListener("DOMContentLoaded", checkAuthStatus);
 
 // ================= Cookie Helpers =================
 function setCookie(cname, cvalue, exdays) {
@@ -128,12 +165,7 @@ async function getEndpoints(latitude, longitude) {
     try {
         const url = `https://api.weather.gov/points/${latitude},${longitude}`;
         const data = await fetchWithUserAgent(url);
-
-        // Store hourly forecast URL from data
-        const hourlyForecastUrl = data.properties.forecastHourly;
-
-        // Fetch hourly weather forecast
-        getForecast(hourlyForecastUrl);
+        getForecast(data.properties.forecastHourly);
     } catch (error) {
         console.error(`%c${error.message}`, "color: red");
     }
@@ -145,12 +177,7 @@ async function getForecast(hourlyForecastUrl) {
         const periods = data.properties.periods;
         const now = new Date();
         const cutoff = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-        const filteredPeriods = periods.filter(period => {
-            const periodStart = new Date(period.startTime);
-            return periodStart >= now && periodStart <= cutoff;
-        });
-
-        console.log("Filtered periods:", filteredPeriods);
+        const filteredPeriods = periods.filter(period => new Date(period.startTime) >= now && new Date(period.startTime) <= cutoff);
         createWeatherCards(filteredPeriods);
     } catch (error) {
         console.error(`%c${error.message}`, "color: red");
@@ -168,35 +195,11 @@ function createWeatherCards(periods) {
     function createCard(element) {
         const div = document.createElement("div");
         div.className = "card";
-        
-        const h3 = document.createElement("h3");
-        const iconElem = document.createElement("i");
-        const p = document.createElement("p");
-
-        const iconClass = getWeatherIconClass(element.shortForecast);
-        iconElem.className = `wi ${iconClass}`;
-        iconElem.classList.add("wi-3x");
-
-        const localTime = new Date(element.startTime).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true
-        });
-        h3.textContent = localTime;
-
-        let tempText;
-        if (element.temperatureUnit === "F") {
-            const fahrenheit = element.temperature;
-            const celsius = Math.round((fahrenheit - 32) * 5 / 9);
-            tempText = `${fahrenheit}°F (${celsius}°C)`;
-        } else {
-            tempText = `${element.temperature}°${element.temperatureUnit}`;
-        }
-        p.innerHTML = `${element.shortForecast}<br>${tempText}`;
-
-        div.appendChild(h3);
-        div.appendChild(iconElem);
-        div.appendChild(p);
+        div.innerHTML = `
+            <h3>${new Date(element.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true })}</h3>
+            <i class="wi ${getWeatherIconClass(element.shortForecast)} wi-3x"></i>
+            <p>${element.shortForecast}<br>${element.temperature}°${element.temperatureUnit}</p>
+        `;
         return div;
     }
 
@@ -210,59 +213,11 @@ let marker;
 
 function initMap() {
     const initialLocation = { lat: 39.8283, lng: -98.5795 };
-    map = new google.maps.Map(document.getElementById("map"), {
-        center: initialLocation,
-        zoom: 4
-    });
+    map = new google.maps.Map(document.getElementById("map"), { center: initialLocation, zoom: 4 });
 
     map.addListener("click", (event) => {
         const clickedLocation = event.latLng;
-        if (marker) {
-            marker.position = clickedLocation;
-        } else {
-            marker = new google.maps.marker.AdvancedMarkerElement({
-                position: clickedLocation,
-                map: map,
-                title: "Selected Location",
-                content: createPin("#4285F4")
-            });
-        }
-        const lat = clickedLocation.lat();
-        const lng = clickedLocation.lng();
-        getEndpoints(lat, lng);
+        marker = new google.maps.Marker({ position: clickedLocation, map: map });
+        getEndpoints(clickedLocation.lat(), clickedLocation.lng());
     });
 }
-
-// Helper function to create a pin using PinView
-function createPin(color = "#4285F4") {
-    const pinView = new google.maps.marker.PinView({
-        scale: 1,
-        background: color
-    });
-    return pinView.element;
-}
-
-// Function to check authentication status across all pages
-function checkAuthStatus() {
-    fetch('/.auth/me')
-        .then(response => response.json())
-        .then(data => {
-            if (data.length > 0) {
-                const user = data[0];
-                document.getElementById("account-status").innerText = "Signed in as " + user.user_id;
-                document.getElementById("login-btn").style.display = "none";
-                document.getElementById("logout-btn").style.display = "inline-block";
-            } else {
-                document.getElementById("account-status").innerText = "Not signed in";
-                document.getElementById("login-btn").style.display = "inline-block";
-                document.getElementById("logout-btn").style.display = "none";
-            }
-        })
-        .catch(error => {
-            console.error("Error checking login status:", error);
-            document.getElementById("account-status").innerText = "Error checking login status";
-        });
-}
-
-// Run authentication check on page load for all pages
-window.onload = checkAuthStatus;
