@@ -39,22 +39,8 @@
                         </li>
                     </ul>
 
-                    <!-- Google Login / Logout Buttons -->
-                    <div id="auth-buttons">
-                        <a id="login-btn" href="/.auth/login/google?post_login_redirect_uri=/" class="btn btn-primary">Sign in with Google</a>
-                        <a id="logout-btn" href="/.auth/login/google?post_login_redirect_uri=/" class="btn btn-danger" style="display:none;">Sign Out</a>
-                    </div>
-
-                    <!-- Display login status -->
-                    <span id="account-status" class="ms-3">Checking login status...</span>
-
-                    <!-- Dark mode toggle -->
-                    <div class="ms-3">
-                        <label class="theme-switch mb-0">
-                            <input type="checkbox" id="theme-toggle">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
+                    <!-- Google Login Button -->
+                    <a id="login-btn" href="/.auth/login/google?post_login_redirect_uri=/" class="btn btn-primary">Sign in with Google</a>
                 </div>
             </div>
         </nav>
@@ -68,10 +54,11 @@
             </div>
         </div>
 
-        <!-- Load scripts at the bottom of the page -->
+        <!-- Include JavaScript -->
         <script src="scripts.js"></script>
     </body>
 </html>
+
 
 
 
