@@ -9,6 +9,14 @@ body {
     max-width: 90%;
 }
 
+/* Override container-fluid for navbar to prevent stacking */
+.navbar .container-fluid {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 100%;
+}
+
 /* Card container now arranged in two rows */
 #card-container {
     display: flex;
