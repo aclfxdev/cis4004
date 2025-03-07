@@ -54,7 +54,6 @@ function checkAuthStatus() {
         let logoutBtn = document.getElementById("logout-btn");
         let accountStatus = document.getElementById("account-status");
 
-        // 🔹 Fix: Retry if elements are not found
         if (!loginBtn || !logoutBtn || !accountStatus) {
             console.error("Auth elements not found, retrying...");
             setTimeout(checkAuthStatus, 500);
@@ -82,12 +81,14 @@ function checkAuthStatus() {
     });
 }
 
+// 🔹 Store last visited page before login
 function storeLastPage() {
     localStorage.setItem("lastPage", window.location.href);
 }
 
+// 🔹 Get the last visited page for redirect
 function getRedirectUrl() {
-    return localStorage.getItem("lastPage") || "/";
+    return localStorage.getItem("lastPage") || "index.html";
 }
 
 // 🔹 Modify login button to store last page before signing in
@@ -99,11 +100,45 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Ensure the function runs when the DOM is fully loaded
+// Run authentication check on page load
 checkAuthStatus();
 
-// Run authentication check on page load after DOM is fully loaded
-document.addEventListener("DOMContentLoaded", checkAuthStatus);
+// ================= Dark Mode Functions (Cookie-Based) =================
+function applyTheme(theme) {
+    if (theme === "dark") {
+        document.body.classList.add("dark-mode");
+    } else {
+        document.body.classList.remove("dark-mode");
+    }
+}
+
+function initTheme() {
+    const themeCookie = getCookie("theme");
+    let theme;
+    if (themeCookie) {
+        theme = themeCookie;
+    } else {
+        const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        theme = prefersDark ? "dark" : "light";
+    }
+    applyTheme(theme);
+    const toggleSwitch = document.getElementById("theme-toggle");
+    if (toggleSwitch) {
+        toggleSwitch.checked = theme === "dark";
+        toggleSwitch.addEventListener("change", function () {
+            if (document.body.classList.contains("dark-mode")) {
+                document.body.classList.remove("dark-mode");
+                setCookie("theme", "light", 30);
+            } else {
+                document.body.classList.add("dark-mode");
+                setCookie("theme", "dark", 30);
+            }
+        });
+    }
+}
+
+// Initialize theme on page load
+document.addEventListener("DOMContentLoaded", initTheme);
 
 // ================= Cookie Helpers =================
 function setCookie(cname, cvalue, exdays) {
@@ -125,6 +160,7 @@ function getCookie(cname) {
     }
     return "";
 }
+
 
 // ================= Dark Mode Functions (Cookie-Based) =================
 function applyTheme(theme) {
