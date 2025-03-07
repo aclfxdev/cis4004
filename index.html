@@ -74,7 +74,7 @@
 
         <!-- JavaScript for Authentication -->
         <script>
-            // Function to check authentication status
+            // Function to check authentication status (but don't force login)
             function checkAuthStatus() {
                 fetch('/.auth/me')
                     .then(response => response.json())
@@ -103,3 +103,4 @@
         <script src="scripts.js"></script>
     </body>
 </html>
+
