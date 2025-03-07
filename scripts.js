@@ -47,51 +47,80 @@ function fetchWithUserAgent(url) {
 }
 
 // ================= Authentication Functions =================
-// Function to check authentication status across all pages
+// Function to check authentication status and sync across pages
 function checkAuthStatus() {
-    document.addEventListener("DOMContentLoaded", () => {
-        let loginBtn = document.getElementById("login-btn");
-        let logoutBtn = document.getElementById("logout-btn");
-        let accountStatus = document.getElementById("account-status");
+    fetch('/.auth/me')
+        .then(response => response.json())
+        .then(data => {
+            let loginBtn = document.getElementById("login-btn");
+            let logoutBtn = document.getElementById("logout-btn");
+            let accountStatus = document.getElementById("account-status");
 
-        if (!loginBtn || !logoutBtn || !accountStatus) {
-            console.error("Auth elements not found, retrying...");
-            setTimeout(checkAuthStatus, 500);
-            return;
-        }
+            if (!loginBtn || !logoutBtn || !accountStatus) {
+                console.error("Auth elements not found, retrying...");
+                setTimeout(checkAuthStatus, 500); // Retry if elements are missing
+                return;
+            }
 
-        fetch('/.auth/me')
-            .then(response => response.json())
-            .then(data => {
-                if (data.length > 0) {
-                    const user = data[0];
-                    accountStatus.innerText = "Signed in as " + (user.user_id || "User");
-                    loginBtn.style.display = "none";
-                    logoutBtn.style.display = "inline-block";
-                } else {
-                    accountStatus.innerText = "Not signed in";
-                    loginBtn.style.display = "inline-block";
-                    logoutBtn.style.display = "none";
-                }
-            })
-            .catch(error => {
-                console.error("Error checking login status:", error);
+            if (data.length > 0) {
+                const user = data[0];
+                accountStatus.innerText = "Signed in as " + (user.user_id || "User");
+                loginBtn.style.display = "none";
+                logoutBtn.style.display = "inline-block";
+
+                // 🔹 Store login status in localStorage to sync across pages
+                localStorage.setItem("isLoggedIn", "true");
+                localStorage.setItem("userID", user.user_id || "User");
+            } else {
+                accountStatus.innerText = "Not signed in";
+                loginBtn.style.display = "inline-block";
+                logoutBtn.style.display = "none";
+
+                // 🔹 Remove login status from localStorage
+                localStorage.removeItem("isLoggedIn");
+                localStorage.removeItem("userID");
+            }
+        })
+        .catch(error => {
+            console.error("Error checking login status:", error);
+            let accountStatus = document.getElementById("account-status");
+            if (accountStatus) {
                 accountStatus.innerText = "Error checking login status";
-            });
-    });
+            }
+        });
 }
 
-// 🔹 Store last visited page before login
+// Function to sync login status between pages using localStorage
+function syncLoginStatus() {
+    let isLoggedIn = localStorage.getItem("isLoggedIn");
+    let userID = localStorage.getItem("userID");
+
+    let loginBtn = document.getElementById("login-btn");
+    let logoutBtn = document.getElementById("logout-btn");
+    let accountStatus = document.getElementById("account-status");
+
+    if (isLoggedIn === "true" && userID) {
+        accountStatus.innerText = "Signed in as " + userID;
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline-block";
+    } else {
+        accountStatus.innerText = "Not signed in";
+        loginBtn.style.display = "inline-block";
+        logoutBtn.style.display = "none";
+    }
+}
+
+// Function to store the last visited page before login
 function storeLastPage() {
     localStorage.setItem("lastPage", window.location.href);
 }
 
-// 🔹 Get the last visited page for redirect
+// Function to get the last visited page for redirection
 function getRedirectUrl() {
     return localStorage.getItem("lastPage") || "index.html";
 }
 
-// 🔹 Modify login button to store last page before signing in
+// Ensure login button stores last page before signing in
 document.addEventListener("DOMContentLoaded", () => {
     let loginBtn = document.getElementById("login-btn");
     if (loginBtn) {
@@ -100,8 +129,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Run authentication check on page load
-checkAuthStatus();
+// Run authentication check and sync login status on page load
+document.addEventListener("DOMContentLoaded", () => {
+    syncLoginStatus();
+    checkAuthStatus();
+});
 
 // ================= Dark Mode Functions (Cookie-Based) =================
 function applyTheme(theme) {
@@ -159,109 +191,6 @@ function getCookie(cname) {
         }
     }
     return "";
-}
-
-
-// ================= Dark Mode Functions (Cookie-Based) =================
-function applyTheme(theme) {
-    if (theme === "dark") {
-        document.body.classList.add("dark-mode");
-    } else {
-        document.body.classList.remove("dark-mode");
-    }
-}
-
-function initTheme() {
-    const themeCookie = getCookie("theme");
-    let theme;
-    if (themeCookie) {
-        theme = themeCookie;
-    } else {
-        const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-        theme = prefersDark ? "dark" : "light";
-    }
-    applyTheme(theme);
-    const toggleSwitch = document.getElementById("theme-toggle");
-    if (toggleSwitch) {
-        toggleSwitch.checked = theme === "dark";
-        toggleSwitch.addEventListener("change", function () {
-            if (document.body.classList.contains("dark-mode")) {
-                document.body.classList.remove("dark-mode");
-                setCookie("theme", "light", 30);
-            } else {
-                document.body.classList.add("dark-mode");
-                setCookie("theme", "dark", 30);
-            }
-        });
-    }
-}
-
-document.addEventListener("DOMContentLoaded", initTheme);
-
-// ================= Geolocation =================
-if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-        (position) => {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
-            console.log(`%cLatitude: ${latitude}\nLongitude: ${longitude}`, "color: green");
-
-            // Fetch endpoints using latitude and longitude
-            getEndpoints(latitude, longitude);
-        },
-        (error) => {
-            console.error(`%cError getting location: ${error.message}`, "color:red");
-        }
-    );
-} else {
-    console.error("%cGeolocation is not supported by this browser!", "color: red");
-}
-
-// ================= Weather.gov API Functions =================
-async function getEndpoints(latitude, longitude) {
-    try {
-        const url = `https://api.weather.gov/points/${latitude},${longitude}`;
-        const data = await fetchWithUserAgent(url);
-        getForecast(data.properties.forecastHourly);
-    } catch (error) {
-        console.error(`%c${error.message}`, "color: red");
-    }
-}
-
-async function getForecast(hourlyForecastUrl) {
-    try {
-        const data = await fetchWithUserAgent(hourlyForecastUrl);
-        const periods = data.properties.periods;
-        const now = new Date();
-        const cutoff = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-        const filteredPeriods = periods.filter(period => new Date(period.startTime) >= now && new Date(period.startTime) <= cutoff);
-        createWeatherCards(filteredPeriods);
-    } catch (error) {
-        console.error(`%c${error.message}`, "color: red");
-    }
-}
-
-function createWeatherCards(periods) {
-    const row1Container = document.getElementById("row-1");
-    const row2Container = document.getElementById("row-2");
-    row1Container.innerHTML = "";
-    row2Container.innerHTML = "";
-    const firstHalf = periods.slice(0, 12);
-    const secondHalf = periods.slice(12, 24);
-
-    function createCard(element) {
-        const div = document.createElement("div");
-        div.className = "card";
-        div.innerHTML = `
-            <h3>${new Date(element.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true })}</h3>
-            <i class="wi ${getWeatherIconClass(element.shortForecast)} wi-3x"></i>
-            <p>${element.shortForecast}<br>${element.temperature}°${element.temperatureUnit}</p>
-        `;
-        return div;
-    }
-
-    firstHalf.forEach(element => row1Container.appendChild(createCard(element)));
-    secondHalf.forEach(element => row2Container.appendChild(createCard(element)));
 }
 
 // ================= Google Maps Integration =================
