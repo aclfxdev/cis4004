@@ -159,6 +159,16 @@ body.dark-mode .wi {
     color: #e0e0e0 !important;
 }
 
+/* Dark mode overrides for Bootstrap Navbar */
+body.dark-mode .navbar {
+    background-color: #333 !important;
+}
+body.dark-mode .navbar .nav-link,
+body.dark-mode .navbar .navbar-brand {
+    color: #e0e0e0 !important;
+}
+
+
 /* Dark mode toggle switch styles */
 .theme-switch {
     position: relative;

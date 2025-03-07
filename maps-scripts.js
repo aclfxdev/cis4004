@@ -1,4 +1,35 @@
-// --- Weather Icons Mapping ---
+/* Dark Mode Functionality for Forecast Map */
+function applyTheme(theme) {
+  if (theme === "dark") {
+    document.body.classList.add("dark-mode");
+  } else {
+    document.body.classList.remove("dark-mode");
+  }
+}
+
+function initTheme() {
+  const storedTheme = localStorage.getItem("theme");
+  const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const theme = storedTheme ? storedTheme : (prefersDark ? "dark" : "light");
+  applyTheme(theme);
+  const toggleSwitch = document.getElementById("theme-toggle");
+  if (toggleSwitch) {
+    toggleSwitch.checked = theme === "dark";
+    toggleSwitch.addEventListener("change", function() {
+      if (document.body.classList.contains("dark-mode")) {
+        document.body.classList.remove("dark-mode");
+        localStorage.setItem("theme", "light");
+      } else {
+        document.body.classList.add("dark-mode");
+        localStorage.setItem("theme", "dark");
+      }
+    });
+  }
+}
+
+document.addEventListener("DOMContentLoaded", initTheme);
+
+/* Weather Icons Mapping */
 const weatherIconClassMap = {
   "Clear": "wi-day-sunny",
   "Sunny": "wi-day-sunny",
