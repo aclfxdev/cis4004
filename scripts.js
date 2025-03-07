@@ -1,9 +1,10 @@
 // ================= Authentication Functions =================
-// Function to check authentication status and sync across pages
+
+// Function to check authentication status
 function checkAuthStatus() {
     fetch('/.auth/me')
         .then(response => {
-            if (!response.ok) throw new Error("Failed to check login status.");
+            if (!response.ok) throw new Error("Login check failed.");
             return response.json();
         })
         .then(data => {
@@ -41,7 +42,7 @@ function checkAuthStatus() {
         });
 }
 
-// Function to sync login status across pages using localStorage
+// Function to sync login status across pages
 function syncLoginStatus() {
     let isLoggedIn = localStorage.getItem("isLoggedIn");
     let userID = localStorage.getItem("userID");
@@ -73,19 +74,26 @@ function getRedirectUrl() {
     return localStorage.getItem("lastPage") || "index.html";
 }
 
-// Modify login button to store last page before signing in
+// Modify login and logout buttons to store last page before redirecting
 document.addEventListener("DOMContentLoaded", () => {
     let loginBtn = document.getElementById("login-btn");
+    let logoutBtn = document.getElementById("logout-btn");
+
     if (loginBtn) {
         loginBtn.addEventListener("click", storeLastPage);
         loginBtn.href = "/.auth/login/google?post_login_redirect_uri=" + encodeURIComponent(getRedirectUrl());
+    }
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+            window.location.href = "/.auth/logout?post_logout_redirect_uri=" + encodeURIComponent(getRedirectUrl());
+        });
     }
 
     // Sync login status and check authentication
     syncLoginStatus();
     checkAuthStatus();
 });
-
 
 // ================= Dark Mode Functions =================
 function applyTheme(theme) {
@@ -135,6 +143,8 @@ function getCookie(cname) {
     }
     return "";
 }
+
+
 
 // ================= Google Maps Integration =================
 let map;
