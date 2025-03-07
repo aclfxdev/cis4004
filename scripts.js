@@ -1,52 +1,3 @@
-// MAIN SCRIPTS FILE.
-
-// --- Weather Icons Mapping ---
-const weatherIconClassMap = {
-    "Clear": "wi-day-sunny",
-    "Sunny": "wi-day-sunny",
-    "Mostly Sunny": "wi-day-sunny-overcast",
-    "Partly Cloudy": "wi-day-cloudy",
-    "Mostly Cloudy": "wi-cloudy",
-    "Cloudy": "wi-cloudy",
-    "Overcast": "wi-cloudy",
-    "Rain": "wi-day-rain",
-    "Showers": "wi-day-showers",
-    "Thunderstorm": "wi-day-thunderstorm",
-    "Snow": "wi-day-snow",
-    "Sleet": "wi-sleet",
-    "Fog": "wi-fog"
-};
-
-function getWeatherIconClass(condition) {
-    for (const key in weatherIconClassMap) {
-        if (condition.indexOf(key) !== -1) {
-            return weatherIconClassMap[key];
-        }
-    }
-    return "wi-na";
-}
-
-// Define the function to fetch with User-Agent
-function fetchWithUserAgent(url) {
-    const headers = {
-        "User-Agent": "CIS-4004 Weather Forecasting (ch797590@ucf.edu / ja939451@ucf.edu)",
-        "Accept": "application/json"
-    };
-
-    return fetch(url, { headers })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .catch(error => {
-            console.error("Error fetching data:", error);
-            throw error;
-        });
-}
-
-// ================= Authentication Functions =================
 // ================= Authentication Functions =================
 // Function to check authentication status and sync across pages
 function checkAuthStatus() {
@@ -91,7 +42,7 @@ function checkAuthStatus() {
         });
 }
 
-// Function to sync login status across all pages using localStorage
+// Function to sync login status across pages using localStorage
 function syncLoginStatus() {
     let isLoggedIn = localStorage.getItem("isLoggedIn");
     let userID = localStorage.getItem("userID");
@@ -185,7 +136,6 @@ function getCookie(cname) {
     return "";
 }
 
-
 // ================= Google Maps Integration =================
 let map;
 let marker;
@@ -199,4 +149,51 @@ function initMap() {
         marker = new google.maps.Marker({ position: clickedLocation, map: map });
         getEndpoints(clickedLocation.lat(), clickedLocation.lng());
     });
+}
+
+// Function to get weather data for selected map location
+async function getEndpoints(latitude, longitude) {
+    try {
+        const url = `https://api.weather.gov/points/${latitude},${longitude}`;
+        const data = await fetchWithUserAgent(url);
+        getForecast(data.properties.forecastHourly);
+    } catch (error) {
+        console.error("Error fetching weather data:", error);
+    }
+}
+
+// Fetch and display weather forecast
+async function getForecast(hourlyForecastUrl) {
+    try {
+        const data = await fetchWithUserAgent(hourlyForecastUrl);
+        const periods = data.properties.periods;
+        displayWeather(periods);
+    } catch (error) {
+        console.error("Error fetching forecast:", error);
+    }
+}
+
+// Display weather forecast
+function displayWeather(periods) {
+    const row1Container = document.getElementById("row-1");
+    const row2Container = document.getElementById("row-2");
+
+    row1Container.innerHTML = "";
+    row2Container.innerHTML = "";
+
+    periods.slice(0, 12).forEach(period => row1Container.appendChild(createWeatherCard(period)));
+    periods.slice(12, 24).forEach(period => row2Container.appendChild(createWeatherCard(period)));
+}
+
+function createWeatherCard(period) {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+        <h3>${new Date(period.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true })}</h3>
+        <i class="wi ${getWeatherIconClass(period.shortForecast)} wi-3x"></i>
+        <p>${period.shortForecast}<br>${period.temperature}°${period.temperatureUnit}</p>
+    `;
+
+    return card;
 }
