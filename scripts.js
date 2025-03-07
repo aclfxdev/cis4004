@@ -2,19 +2,21 @@
 // Function to check authentication status and sync across pages
 function checkAuthStatus() {
     fetch('/.auth/me')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error("Failed to check login status.");
+            return response.json();
+        })
         .then(data => {
             let loginBtn = document.getElementById("login-btn");
             let logoutBtn = document.getElementById("logout-btn");
             let accountStatus = document.getElementById("account-status");
 
             if (!loginBtn || !logoutBtn || !accountStatus) {
-                console.error("Auth elements not found, retrying...");
-                setTimeout(checkAuthStatus, 500);
+                console.error("Auth elements not found.");
                 return;
             }
 
-            if (data.length > 0) {
+            if (data && data.length > 0) {
                 const user = data[0];
                 accountStatus.innerText = "Signed in as " + (user.user_id || "User");
                 loginBtn.style.display = "none";
@@ -35,10 +37,7 @@ function checkAuthStatus() {
         })
         .catch(error => {
             console.error("Error checking login status:", error);
-            let accountStatus = document.getElementById("account-status");
-            if (accountStatus) {
-                accountStatus.innerText = "Error checking login status";
-            }
+            document.getElementById("account-status").innerText = "Error checking login status";
         });
 }
 
@@ -64,17 +63,17 @@ function syncLoginStatus() {
     }
 }
 
-// Function to store the last visited page before login
+// Store last visited page before login
 function storeLastPage() {
     localStorage.setItem("lastPage", window.location.href);
 }
 
-// Function to get the last visited page for redirection
+// Get the last visited page for redirection
 function getRedirectUrl() {
     return localStorage.getItem("lastPage") || "index.html";
 }
 
-// Ensure login button stores last page before signing in
+// Modify login button to store last page before signing in
 document.addEventListener("DOMContentLoaded", () => {
     let loginBtn = document.getElementById("login-btn");
     if (loginBtn) {
@@ -82,10 +81,11 @@ document.addEventListener("DOMContentLoaded", () => {
         loginBtn.href = "/.auth/login/google?post_login_redirect_uri=" + encodeURIComponent(getRedirectUrl());
     }
 
-    // Run login sync and check authentication
+    // Sync login status and check authentication
     syncLoginStatus();
     checkAuthStatus();
 });
+
 
 // ================= Dark Mode Functions =================
 function applyTheme(theme) {
