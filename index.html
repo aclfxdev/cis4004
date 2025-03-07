@@ -34,10 +34,10 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="https://cis4004.azurewebsites.net/">Home</a>
+                            <a class="nav-link active" aria-current="page" href="index.html">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="https://cis4004.azurewebsites.net/forecast-map.html">Forecast Map</a>
+                            <a class="nav-link" href="forecast-map.html">Forecast Map</a>
                         </li>
                     </ul>
                     
@@ -72,35 +72,10 @@
             </div>
         </div>
 
-        <!-- JavaScript for Authentication -->
-        <script>
-            // Function to check authentication status (but don't force login)
-            function checkAuthStatus() {
-                fetch('/.auth/me')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.length > 0) {
-                            const user = data[0];
-                            document.getElementById("account-status").innerText = "Signed in as " + user.user_id;
-                            document.getElementById("login-btn").style.display = "none";
-                            document.getElementById("logout-btn").style.display = "inline-block";
-                        } else {
-                            document.getElementById("account-status").innerText = "Not signed in";
-                            document.getElementById("login-btn").style.display = "inline-block";
-                            document.getElementById("logout-btn").style.display = "none";
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error checking login status:", error);
-                        document.getElementById("account-status").innerText = "Error checking login status";
-                    });
-            }
-
-            // Call the function when the page loads
-            window.onload = checkAuthStatus;
-        </script>
-
+        <!-- Include JavaScript for authentication and other scripts -->
         <script src="scripts.js"></script>
+
     </body>
 </html>
+
 
