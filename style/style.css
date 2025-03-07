@@ -17,6 +17,16 @@ body {
     max-width: 100%;
 }
 
+/* Force nav links to appear side by side */
+.navbar-nav {
+    flex-direction: row !important;
+}
+
+.navbar-nav .nav-item {
+    margin-left: 1rem; /* optional spacing between links */
+}
+
+
 /* Card container now arranged in two rows */
 #card-container {
     display: flex;
