@@ -5,18 +5,18 @@
         <meta charset="UTF-8">
         <meta name="description" content="Pick a point on the map to get a 24-hour forecast">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
+
         <!-- Link existing stylesheet -->
         <link rel="stylesheet" href="style/style.css">
-        
+
         <!-- Link maps-specific stylesheet -->
         <link rel="stylesheet" href="style/maps-style.css">
-        
+
         <!-- Link Roboto font -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-        
+
         <!-- Link Weather icons -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.10/css/weather-icons.min.css">
         
@@ -41,23 +41,6 @@
                             <a class="nav-link active" href="forecast-map.html">Forecast Map</a>
                         </li>
                     </ul>
-
-                    <!-- Google Login / Logout Buttons -->
-                    <div id="auth-buttons">
-                        <a id="login-btn" href="/.auth/login/google?post_login_redirect_uri=/" class="btn btn-primary">Sign in with Google</a>
-                        <a id="logout-btn" href="/.auth/login/google?post_login_redirect_uri=/" class="btn btn-danger" style="display:none;">Sign Out</a>
-                    </div>
-
-                    <!-- Display login status -->
-                    <span id="account-status" class="ms-3">Checking login status...</span>
-
-                    <!-- Dark mode toggle -->
-                    <div class="ms-3">
-                        <label class="theme-switch mb-0">
-                            <input type="checkbox" id="theme-toggle">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
                 </div>
             </div>
         </nav>
@@ -75,9 +58,6 @@
 
         <!-- Load custom maps script -->
         <script src="maps-scripts.js"></script>
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8XTNlcrRt09yuhOeCSe3Xnd8_U_3FdqY&libraries=places,geometry,marker&callback=initMap"></script>
-        
-        <!-- Load scripts at the bottom of the page -->
-        <script src="scripts.js"></script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=marker&callback=initMap"></script>
     </body>
 </html>
