@@ -55,16 +55,7 @@ function initTheme() {
 
 document.addEventListener("DOMContentLoaded", initTheme);
 
-// Helper function to create a pin for AdvancedMarkerElement
-function createPin(color = "#4285F4") {
-    const pinView = new google.maps.marker.PinView({
-        scale: 1,
-        background: color
-    });
-    return pinView.element;
-}
-
-/* Weather Icons Mapping */
+// Weather Icons Mapping
 const weatherIconClassMap = {
     "Clear": "wi-day-sunny",
     "Sunny": "wi-day-sunny",
@@ -90,18 +81,23 @@ function getWeatherIconClass(condition) {
     return "wi-na";
 }
 
-// Fetch with User-Agent for weather.gov API requests
+// Define function to fetch with User-Agent for weather.gov API requests
 function fetchWithUserAgent(url) {
     const headers = {
-        "User-Agent": "CIS-4004 Weather Forecasting (email@example.com)",
+        "User-Agent": "CIS-4004 Weather Forecasting (ch797590@ucf.edu / ja939451@ucf.edu)",
         "Accept": "application/json"
     };
+
     return fetch(url, { headers })
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
             return response.json();
+        })
+        .catch(error => {
+            console.error("Error fetching data:", error);
+            throw error;
         });
 }
 
@@ -128,86 +124,7 @@ async function getForecast(hourlyForecastUrl) {
             const periodStart = new Date(period.startTime);
             return periodStart >= now && periodStart <= cutoff;
         });
+        console.log("Filtered periods:", filteredPeriods);
         createWeatherCards(filteredPeriods);
     } catch (error) {
-        console.error(error);
-    }
-}
-
-// Render forecast cards into two rows (first 12 and last 12)
-function createWeatherCards(periods) {
-    const row1Container = document.getElementById("row-1");
-    const row2Container = document.getElementById("row-2");
-    row1Container.innerHTML = "";
-    row2Container.innerHTML = "";
-    const firstHalf = periods.slice(0, 12);
-    const secondHalf = periods.slice(12, 24);
-
-    function createCard(element) {
-        const div = document.createElement("div");
-        div.className = "card";
-        
-        const h3 = document.createElement("h3");
-        const iconElem = document.createElement("i");
-        const p = document.createElement("p");
-
-        const iconClass = getWeatherIconClass(element.shortForecast);
-        iconElem.className = `wi ${iconClass}`;
-        iconElem.classList.add("wi-3x");
-
-        const localTime = new Date(element.startTime).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true
-        });
-        h3.textContent = localTime;
-
-        let tempText;
-        if (element.temperatureUnit === "F") {
-            const fahrenheit = element.temperature;
-            const celsius = Math.round((fahrenheit - 32) * 5 / 9);
-            tempText = `${fahrenheit}°F (${celsius}°C)`;
-        } else {
-            tempText = `${element.temperature}°${element.temperatureUnit}`;
-        }
-        p.innerHTML = `${element.shortForecast}<br>${tempText}`;
-
-        div.appendChild(h3);
-        div.appendChild(iconElem);
-        div.appendChild(p);
-
-        return div;
-    }
-
-    firstHalf.forEach(element => row1Container.appendChild(createCard(element)));
-    secondHalf.forEach(element => row2Container.appendChild(createCard(element)));
-}
-
-// --- Google Maps Integration ---
-let map;
-let marker;
-
-function initMap() {
-    const initialLocation = { lat: 39.8283, lng: -98.5795 };
-    map = new google.maps.Map(document.getElementById("map"), {
-        center: initialLocation,
-        zoom: 4
-    });
-
-    map.addListener("click", (event) => {
-        const clickedLocation = event.latLng;
-        if (marker) {
-            marker.position = clickedLocation;
-        } else {
-            marker = new google.maps.marker.AdvancedMarkerElement({
-                position: clickedLocation,
-                map: map,
-                title: "Selected Location",
-                content: createPin("#4285F4")
-            });
-        }
-        const lat = clickedLocation.lat();
-        const lng = clickedLocation.lng();
-        getEndpoints(lat, lng);
-    });
-}
+        console.error(`%c${error.message}`, "
