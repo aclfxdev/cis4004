@@ -1,35 +1,107 @@
-// ================= Authentication =================
+// ================= Authentication Functions =================
 
-// Function to check authentication status
+// Function to check authentication status across all pages
 function checkAuthStatus() {
     fetch('/.auth/me')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error("Login check failed.");
+            return response.json();
+        })
         .then(data => {
             let loginBtn = document.getElementById("login-btn");
             let logoutBtn = document.getElementById("logout-btn");
             let accountStatus = document.getElementById("account-status");
 
-            if (data.length > 0) {
-                // User is logged in
+            if (!loginBtn || !logoutBtn || !accountStatus) {
+                console.error("Auth elements not found.");
+                return;
+            }
+
+            if (data && data.length > 0) {
                 const user = data[0];
-                if (accountStatus) accountStatus.innerText = "Signed in as " + (user.user_id || "User");
-                if (loginBtn) loginBtn.style.display = "none";
-                if (logoutBtn) logoutBtn.style.display = "inline-block";
+                accountStatus.innerText = "Signed in as " + (user.user_id || "User");
+                loginBtn.style.display = "none";
+                logoutBtn.style.display = "inline-block";
+
+                // Store login status in localStorage to sync across pages
+                localStorage.setItem("isLoggedIn", "true");
+                localStorage.setItem("userID", user.user_id || "User");
+
+                // Ensure the login status updates correctly
+                syncLoginStatus();
             } else {
-                // User is not logged in
-                if (accountStatus) accountStatus.innerText = "Not signed in";
-                if (loginBtn) loginBtn.style.display = "inline-block";
-                if (logoutBtn) logoutBtn.style.display = "none";
+                accountStatus.innerText = "Not signed in";
+                loginBtn.style.display = "inline-block";
+                logoutBtn.style.display = "none";
+
+                // Remove login status from localStorage
+                localStorage.removeItem("isLoggedIn");
+                localStorage.removeItem("userID");
             }
         })
         .catch(error => {
             console.error("Error checking login status:", error);
+            document.getElementById("account-status").innerText = "Error checking login status";
         });
 }
 
-// Run authentication check on page load
-document.addEventListener("DOMContentLoaded", checkAuthStatus);
+// Function to sync login status across pages
+function syncLoginStatus() {
+    let isLoggedIn = localStorage.getItem("isLoggedIn");
+    let userID = localStorage.getItem("userID");
 
+    let loginBtn = document.getElementById("login-btn");
+    let logoutBtn = document.getElementById("logout-btn");
+    let accountStatus = document.getElementById("account-status");
+
+    if (!loginBtn || !logoutBtn || !accountStatus) return;
+
+    if (isLoggedIn === "true" && userID) {
+        accountStatus.innerText = "Signed in as " + userID;
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline-block";
+    } else {
+        accountStatus.innerText = "Not signed in";
+        loginBtn.style.display = "inline-block";
+        logoutBtn.style.display = "none";
+    }
+}
+
+// Store last visited page before login
+function storeLastPage() {
+    console.log("Storing last page:", window.location.href);
+    localStorage.setItem("lastPage", window.location.href);
+}
+
+// Get the last visited page for redirection
+function getRedirectUrl() {
+    let lastPage = localStorage.getItem("lastPage") || "index.html";
+    console.log("Redirecting back to:", lastPage);
+    return lastPage;
+}
+
+// Modify login and logout buttons to store last page before redirecting
+document.addEventListener("DOMContentLoaded", () => {
+    let loginBtn = document.getElementById("login-btn");
+    let logoutBtn = document.getElementById("logout-btn");
+
+    if (loginBtn) {
+        loginBtn.addEventListener("click", storeLastPage);
+        loginBtn.href = "/.auth/login/google?post_login_redirect_uri=" + encodeURIComponent(getRedirectUrl());
+    }
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+            localStorage.removeItem("isLoggedIn");
+            localStorage.removeItem("userID");
+            window.location.href = "/.auth/logout?post_logout_redirect_uri=" + encodeURIComponent("index.html");
+        });
+    }
+
+    // Run login sync and authentication check
+    syncLoginStatus();
+    checkAuthStatus();
+});
 
 // ================= Dark Mode Functions =================
 function applyTheme(theme) {
@@ -79,6 +151,7 @@ function getCookie(cname) {
     }
     return "";
 }
+
 
 // ================= Google Maps Integration =================
 let map;
