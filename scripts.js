@@ -82,9 +82,25 @@ function checkAuthStatus() {
     });
 }
 
-// 🔹 Fix: Ensure the function runs when the DOM is fully loaded
-checkAuthStatus();
+function storeLastPage() {
+    localStorage.setItem("lastPage", window.location.href);
+}
 
+function getRedirectUrl() {
+    return localStorage.getItem("lastPage") || "/";
+}
+
+// 🔹 Modify login button to store last page before signing in
+document.addEventListener("DOMContentLoaded", () => {
+    let loginBtn = document.getElementById("login-btn");
+    if (loginBtn) {
+        loginBtn.addEventListener("click", storeLastPage);
+        loginBtn.href = "/.auth/login/google?post_login_redirect_uri=" + encodeURIComponent(getRedirectUrl());
+    }
+});
+
+// Ensure the function runs when the DOM is fully loaded
+checkAuthStatus();
 
 // Run authentication check on page load after DOM is fully loaded
 document.addEventListener("DOMContentLoaded", checkAuthStatus);
