@@ -166,11 +166,14 @@ function initMap() {
   map.addListener("click", (event) => {
     const clickedLocation = event.latLng;
     if (marker) {
-      marker.setPosition(clickedLocation);
+      // Update the position of the existing marker using AdvancedMarkerElement
+      marker.setOptions({ position: clickedLocation });
     } else {
-      marker = new google.maps.Marker({
+      // Create a new marker using AdvancedMarkerElement
+      marker = new google.maps.marker.AdvancedMarkerElement({
         position: clickedLocation,
-        map: map
+        map: map,
+        title: "Selected Location"
       });
     }
     const lat = clickedLocation.lat();
