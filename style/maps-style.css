@@ -1,4 +1,12 @@
 /* Set up the map container size */
+@media (max-width: 768px) {
+	#map {
+		height: 20rem;
+		width: 80%;
+		margin-bottom: 1rem;
+	}
+}
+
 #map {
 	height: 40rem;
 	width: 60%;
