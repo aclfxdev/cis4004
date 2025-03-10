@@ -53,18 +53,27 @@
         </div>
     </nav>
 
-    <div class="container-fluid">
-        <h1>Google Maps Forecast</h1>
-        <h4><em>Pick a location within the US on the map to retrieve the forecast.</em></h4>
-        <div id="map" style="height: 500px; width: 100%;"></div>
-        <div id="location-info" style="margin: 1rem 0; text-align: center;"></div>
-        <div id="card-container">
-            <div id="row-1" class="forecast-row"></div>
-            <div id="row-2" class="forecast-row"></div>
-        </div>
-    </div>
-
-    <script src="maps-scripts.js"></script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap"></script>
-</body>
-</html>
+        <div class="container-fluid">
+             <br><br>
+             <h1>Google Maps Forecast</h1>
+             <br>
+             <h4><em>Pick a location within the US on the map to retrieve the forecast for that area.</em></h4>
+             <!-- Google Map Container -->
+             <div id="map"></div>
+             <!-- NEW: Location info below the map -->
+             <div id="location-info" style="margin: 1rem 0; text-align: center;">
+                 <!-- Nearest city and station info will be displayed here -->
+             </div>
+             <!-- Forecast Container -->
+             <div id="card-container">
+                 <div id="row-1" class="forecast-row"></div>
+                 <div id="row-2" class="forecast-row"></div>
+             </div>
+         </div>
+ 
+         <!-- Load custom maps script -->
+         <script src="maps-scripts.js"></script>
+         <!-- Load the Google Maps API with your key -->
+         <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8XTNlcrRt09yuhOeCSe3Xnd8_U_3FdqY&libraries=marker&callback=initMap"></script>
+     </body>
+ </html>

@@ -69,8 +69,8 @@ function initMap() {
 
 async function fetchWithUserAgent(url) {
     const headers = {
-        "User-Agent": "CIS-4004 Weather Forecasting",
-        "Accept": "application/json"
+        "User-Agent": "CIS-4004 Weather Forecasting (ch797590@ucf.edu / ja939451@ucf.edu)",
+         "Accept": "application/json"
     };
     const response = await fetch(url, { headers });
     if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
