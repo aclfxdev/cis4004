@@ -11,8 +11,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.10/css/weather-icons.min.css">
     
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 
     <!-- Bootstrap -->
@@ -42,6 +40,14 @@
                     <a id="logout-btn" href="#" class="btn btn-danger" style="display:none;">Sign Out</a>
                 </div>
                 <span id="account-status" class="ms-3">Checking login status...</span>
+
+                <!-- Dark Mode Toggle -->
+                <div class="ms-3">
+                    <label class="theme-switch mb-0">
+                        <input type="checkbox" id="theme-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
             </div>
         </div>
     </nav>
