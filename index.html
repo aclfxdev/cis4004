@@ -20,7 +20,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body class="roboto-font-user">
-    <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
             <span class="navbar-brand mb-0 h1">CIS 4004 Weather App</span>
@@ -31,29 +30,18 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+                        <a class="nav-link active" href="index.html">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="forecast-map.html">Forecast Map</a>
                     </li>
                 </ul>
 
-                <!-- Google Login / Logout Buttons -->
                 <div id="auth-buttons">
                     <a id="login-btn" href="#" class="btn btn-primary">Sign in with Google</a>
                     <a id="logout-btn" href="#" class="btn btn-danger" style="display:none;">Sign Out</a>
                 </div>
-
-                <!-- Display login status -->
                 <span id="account-status" class="ms-3">Checking login status...</span>
-
-                <!-- Dark mode toggle -->
-                <div class="ms-3">
-                    <label class="theme-switch mb-0">
-                        <input type="checkbox" id="theme-toggle">
-                        <span class="slider round"></span>
-                    </label>
-                </div>
             </div>
         </div>
     </nav>
@@ -67,7 +55,6 @@
         </div>
     </div>
 
-    <!-- JavaScript -->
     <script src="scripts.js"></script>
 </body>
 </html>
