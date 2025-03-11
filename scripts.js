@@ -264,16 +264,16 @@ function checkAuthStatus() {
         });
 }
 
-// Run authentication check on page load for all pages
-window.onload = checkAuthStatus;
-
-window.onload = function() {
-    checkAuthStatus();
-    
-    // Dynamically update the login button's redirect to the current page
+// Auth check and dynamically update login button redirect
+window.addEventListener('load', function() {
+    // First, update the login button's redirect dynamically:
     const loginBtn = document.getElementById("login-btn");
     if (loginBtn) {
         const currentPath = window.location.pathname;
         loginBtn.href = "/.auth/login/google?post_login_redirect_uri=" + encodeURIComponent(currentPath);
+        console.log("Updated login btn href:", loginBtn.href);
     }
-};
+    
+    // Then, check the authentication status:
+    checkAuthStatus();
+});
