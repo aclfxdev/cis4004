@@ -266,3 +266,14 @@ function checkAuthStatus() {
 
 // Run authentication check on page load for all pages
 window.onload = checkAuthStatus;
+
+window.onload = function() {
+    checkAuthStatus();
+    
+    // Dynamically update the login button's redirect to the current page
+    const loginBtn = document.getElementById("login-btn");
+    if (loginBtn) {
+        const currentPath = window.location.pathname;
+        loginBtn.href = "/.auth/login/google?post_login_redirect_uri=" + encodeURIComponent(currentPath);
+    }
+};
