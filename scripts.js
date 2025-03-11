@@ -1,134 +1,7 @@
-// ================= Authentication Functions =================
+// MAIN SCRIPTS FILE.
 
-function checkAuthStatus() {
-    fetch('/.auth/me')
-        .then(response => response.json())
-        .then(data => {
-            const loginBtn = document.getElementById("login-btn");
-            const logoutBtn = document.getElementById("logout-btn");
-            const accountStatus = document.getElementById("account-status");
-
-            if (data.clientPrincipal) {
-                accountStatus.innerText = "Signed in as " + data.clientPrincipal.userDetails;
-                loginBtn.style.display = "none";
-                logoutBtn.style.display = "inline-block";
-                localStorage.setItem("isLoggedIn", "true");
-            } else {
-                accountStatus.innerText = "Not signed in";
-                loginBtn.style.display = "inline-block";
-                logoutBtn.style.display = "none";
-                localStorage.removeItem("isLoggedIn");
-            }
-        })
-        .catch(() => document.getElementById("account-status").innerText = "Error checking login status");
-}
-
-function getRedirectUrl() {
-    return localStorage.getItem("lastPage") || window.location.href;
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    const loginBtn = document.getElementById("login-btn");
-    const logoutBtn = document.getElementById("logout-btn");
-
-    loginBtn.href = "/.auth/login/google?post_login_redirect_uri=" + encodeURIComponent(getRedirectUrl());
-    
-    logoutBtn.addEventListener("click", () => {
-        localStorage.clear();
-        window.location.href = "/.auth/logout?post_logout_redirect_uri=/";
-    });
-
-    checkAuthStatus();
-});
-
-// ================= Google Maps Integration =================
-
-let map, marker;
-
-function initMap() {
-    map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 39.8283, lng: -98.5795 },
-        zoom: 4
-    });
-
-    map.addListener("click", (event) => {
-        const clickedLocation = event.latLng;
-        if (marker) {
-            marker.setPosition(clickedLocation);
-        } else {
-            marker = new google.maps.Marker({
-                position: clickedLocation,
-                map: map
-            });
-        }
-        getEndpoints(clickedLocation.lat(), clickedLocation.lng());
-    });
-}
-
-// ================= Weather API Integration =================
-
-async function fetchWithUserAgent(url) {
-    const headers = {
-        "User-Agent": "CIS-4004 Weather Forecasting (ch797590@ucf.edu / ja939451@ucf.edu)",
-         "Accept": "application/json"
-    };
-    const response = await fetch(url, { headers });
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-    return response.json();
-}
-
-async function getEndpoints(latitude, longitude) {
-    try {
-        const url = `https://api.weather.gov/points/${latitude},${longitude}`;
-        const data = await fetchWithUserAgent(url);
-
-        if (!data.properties || !data.properties.forecastHourly) {
-            console.error("No forecast data available.");
-            return;
-        }
-
-        document.getElementById("location-info").textContent = 
-            `Location: ${data.properties.relativeLocation.properties.city}, ${data.properties.relativeLocation.properties.state}`;
-        
-        getForecast(data.properties.forecastHourly);
-    } catch (error) {
-        console.error("Error fetching weather data:", error);
-    }
-}
-
-async function getForecast(hourlyForecastUrl) {
-    try {
-        const data = await fetchWithUserAgent(hourlyForecastUrl);
-        const periods = data.properties.periods.slice(0, 24);
-        displayWeather(periods);
-    } catch (error) {
-        console.error("Error fetching forecast:", error);
-    }
-}
-
-function displayWeather(periods) {
-    const row1Container = document.getElementById("row-1");
-    const row2Container = document.getElementById("row-2");
-    row1Container.innerHTML = "";
-    row2Container.innerHTML = "";
-
-    periods.slice(0, 12).forEach(period => row1Container.appendChild(createWeatherCard(period)));
-    periods.slice(12, 24).forEach(period => row2Container.appendChild(createWeatherCard(period)));
-}
-
-function createWeatherCard(period) {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-        <h3>${new Date(period.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true })}</h3>
-        <i class="wi ${getWeatherIconClass(period.shortForecast)} wi-3x"></i>
-        <p>${period.shortForecast}<br>${period.temperature}°${period.temperatureUnit}</p>
-    `;
-    return card;
-}
-
-// ================= Weather Icons Mapping =================
-
+// --- Weather Icons Mapping ---
+// Maps keywords from the forecast condition to weather-icons CSS classes.
 const weatherIconClassMap = {
     "Clear": "wi-day-sunny",
     "Sunny": "wi-day-sunny",
@@ -154,8 +27,48 @@ function getWeatherIconClass(condition) {
     return "wi-na";
 }
 
-// ================= Dark Mode Functions =================
+// Define the function to fetch with User-Agent
+function fetchWithUserAgent(url) {
+    const headers = {
+        "User-Agent": "CIS-4004 Weather Forecasting (ch797590@ucf.edu / ja939451@ucf.edu)",
+        "Accept": "application/json"
+    };
 
+    return fetch(url, { headers })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .catch(error => {
+            console.error("Error fetching data:", error);
+            throw error;
+        });
+}
+
+// ================= Cookie Helpers =================
+function setCookie(cname, cvalue, exdays) {
+    const d = new Date();
+    d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
+    const expires = "expires=" + d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+    const name = cname + "=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(";");
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i].trim();
+        if (c.indexOf(name) === 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+// ================= Dark Mode Functions (Cookie-Based) =================
 function applyTheme(theme) {
     if (theme === "dark") {
         document.body.classList.add("dark-mode");
@@ -166,37 +79,190 @@ function applyTheme(theme) {
 
 function initTheme() {
     const themeCookie = getCookie("theme");
-    let theme = themeCookie || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    let theme;
+    if (themeCookie) {
+        theme = themeCookie;
+    } else {
+        const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        theme = prefersDark ? "dark" : "light";
+    }
     applyTheme(theme);
-
     const toggleSwitch = document.getElementById("theme-toggle");
     if (toggleSwitch) {
         toggleSwitch.checked = theme === "dark";
         toggleSwitch.addEventListener("change", function () {
-            const newTheme = document.body.classList.contains("dark-mode") ? "light" : "dark";
-            applyTheme(newTheme);
-            setCookie("theme", newTheme, 30);
+            if (document.body.classList.contains("dark-mode")) {
+                document.body.classList.remove("dark-mode");
+                setCookie("theme", "light", 30);
+            } else {
+                document.body.classList.add("dark-mode");
+                setCookie("theme", "dark", 30);
+            }
         });
     }
 }
 
 document.addEventListener("DOMContentLoaded", initTheme);
 
-// ================= Cookie Helpers =================
+// ================= Geolocation =================
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            console.log(`%cLatitude: ${latitude}\nLongitude: ${longitude}`, "color: green");
 
-function setCookie(cname, cvalue, exdays) {
-    const d = new Date();
-    d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
-    document.cookie = `${cname}=${cvalue};expires=${d.toUTCString()};path=/`;
+            // Fetch endpoints using latitude and longitude
+            getEndpoints(latitude, longitude);
+        },
+        (error) => {
+            console.error(`%cError getting location: ${error.message}`, "color:red");
+        }
+    );
+} else {
+    console.error("%cGeolocation is not supported by this browser!", "color: red");
 }
 
-function getCookie(cname) {
-    const name = cname + "=";
-    const decodedCookie = decodeURIComponent(document.cookie);
-    const ca = decodedCookie.split(";");
-    for (let i = 0; i < ca.length; i++) {
-        let c = ca[i].trim();
-        if (c.indexOf(name) === 0) return c.substring(name.length, c.length);
+// ================= Weather.gov API Functions =================
+async function getEndpoints(latitude, longitude) {
+    try {
+        const url = `https://api.weather.gov/points/${latitude},${longitude}`;
+        const data = await fetchWithUserAgent(url);
+
+        // Store hourly forecast URL from data
+        const hourlyForecastUrl = data.properties.forecastHourly;
+
+        // Fetch hourly weather forecast
+        getForecast(hourlyForecastUrl);
+    } catch (error) {
+        console.error(`%c${error.message}`, "color: red");
     }
-    return "";
 }
+
+async function getForecast(hourlyForecastUrl) {
+    try {
+        const data = await fetchWithUserAgent(hourlyForecastUrl);
+        const periods = data.properties.periods;
+        const now = new Date();
+        const cutoff = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+        const filteredPeriods = periods.filter(period => {
+            const periodStart = new Date(period.startTime);
+            return periodStart >= now && periodStart <= cutoff;
+        });
+
+        console.log("Filtered periods:", filteredPeriods);
+        createWeatherCards(filteredPeriods);
+    } catch (error) {
+        console.error(`%c${error.message}`, "color: red");
+    }
+}
+
+function createWeatherCards(periods) {
+    const row1Container = document.getElementById("row-1");
+    const row2Container = document.getElementById("row-2");
+    row1Container.innerHTML = "";
+    row2Container.innerHTML = "";
+    const firstHalf = periods.slice(0, 12);
+    const secondHalf = periods.slice(12, 24);
+
+    function createCard(element) {
+        const div = document.createElement("div");
+        div.className = "card";
+        
+        const h3 = document.createElement("h3");
+        const iconElem = document.createElement("i");
+        const p = document.createElement("p");
+
+        const iconClass = getWeatherIconClass(element.shortForecast);
+        iconElem.className = `wi ${iconClass}`;
+        iconElem.classList.add("wi-3x");
+
+        const localTime = new Date(element.startTime).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true
+        });
+        h3.textContent = localTime;
+
+        let tempText;
+        if (element.temperatureUnit === "F") {
+            const fahrenheit = element.temperature;
+            const celsius = Math.round((fahrenheit - 32) * 5 / 9);
+            tempText = `${fahrenheit}°F (${celsius}°C)`;
+        } else {
+            tempText = `${element.temperature}°${element.temperatureUnit}`;
+        }
+        p.innerHTML = `${element.shortForecast}<br>${tempText}`;
+
+        div.appendChild(h3);
+        div.appendChild(iconElem);
+        div.appendChild(p);
+        return div;
+    }
+
+    firstHalf.forEach(element => row1Container.appendChild(createCard(element)));
+    secondHalf.forEach(element => row2Container.appendChild(createCard(element)));
+}
+
+// ================= Google Maps Integration =================
+let map;
+let marker;
+
+function initMap() {
+    const initialLocation = { lat: 39.8283, lng: -98.5795 };
+    map = new google.maps.Map(document.getElementById("map"), {
+        center: initialLocation,
+        zoom: 4
+    });
+
+    map.addListener("click", (event) => {
+        const clickedLocation = event.latLng;
+        if (marker) {
+            marker.position = clickedLocation;
+        } else {
+            marker = new google.maps.marker.AdvancedMarkerElement({
+                position: clickedLocation,
+                map: map,
+                title: "Selected Location",
+                content: createPin("#4285F4")
+            });
+        }
+        const lat = clickedLocation.lat();
+        const lng = clickedLocation.lng();
+        getEndpoints(lat, lng);
+    });
+}
+
+// Helper function to create a pin using PinView
+function createPin(color = "#4285F4") {
+    const pinView = new google.maps.marker.PinView({
+        scale: 1,
+        background: color
+    });
+    return pinView.element;
+}
+
+// Function to check authentication status across all pages
+function checkAuthStatus() {
+    fetch('/.auth/me')
+        .then(response => response.json())
+        .then(data => {
+            if (data.length > 0) {
+                const user = data[0];
+                document.getElementById("account-status").innerText = "Signed in as " + user.user_id;
+                document.getElementById("login-btn").style.display = "none";
+                document.getElementById("logout-btn").style.display = "inline-block";
+            } else {
+                document.getElementById("account-status").innerText = "Not signed in";
+                document.getElementById("login-btn").style.display = "inline-block";
+                document.getElementById("logout-btn").style.display = "none";
+            }
+        })
+        .catch(error => {
+            console.error("Error checking login status:", error);
+            document.getElementById("account-status").innerText = "Error checking login status";
+        });
+}
+
+// Run authentication check on page load for all pages
+window.onload = checkAuthStatus;
