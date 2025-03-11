@@ -244,7 +244,9 @@ function createPin(color = "#4285F4") {
 
 // Function to check authentication status across all pages
 function checkAuthStatus() {
-    fetch('/.auth/me')
+    fetch('/.auth/me', {
+		credentials: 'include'  // Explicitly include cookies
+	})
         .then(response => response.json())
         .then(data => {
             if (data.length > 0) {
@@ -264,5 +266,16 @@ function checkAuthStatus() {
         });
 }
 
-// Run authentication check on page load for all pages
-window.onload = checkAuthStatus;
+// Auth check and dynamically update login button redirect
+window.addEventListener('load', function() {
+    // First, update the login button's redirect dynamically:
+    const loginBtn = document.getElementById("login-btn");
+    if (loginBtn) {
+        const currentPath = window.location.pathname;
+        loginBtn.href = "/.auth/login/google?post_login_redirect_uri=" + encodeURIComponent(currentPath);
+        console.log("Updated login btn href:", loginBtn.href);
+    }
+    
+    // Then, check the authentication status:
+    checkAuthStatus();
+});
