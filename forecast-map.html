@@ -30,22 +30,32 @@
             <div class="container-fluid">
                 <span class="navbar-brand mb-0 h1">CIS 4004 Weather App</span>
                 <!-- Navbar toggler for mobile -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav2" 
-                    aria-controls="navbarNav2" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <!-- Collapsible container for nav links and dark mode toggle -->
-                <div class="collapse navbar-collapse" id="navbarNav2">
+                <!-- Collapsible container for nav links, login/logout buttons, and dark mode toggle -->
+                <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="https://cis4004.azurewebsites.net/">Home</a>
+                            <a class="nav-link" href="index.html">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="https://cis4004.azurewebsites.net/forecast-map.html">Forecast Map</a>
+                            <a class="nav-link active" aria-current="page"  href="forecast-map.html">Forecast Map</a>
                         </li>
                     </ul>
-                    <!-- Dark mode toggle on the right (no label) -->
-                    <div>
+                    
+                    <!-- Google Login / Logout Buttons -->
+                    <div id="auth-buttons">
+                        <a id="login-btn" href="/.auth/login/google?post_login_redirect_uri=/" class="btn btn-primary">Sign in with Google</a>
+                        <a id="logout-btn" href="/.auth/logout?post_logout_redirect_uri=/" class="btn btn-danger" style="display:none;">Sign Out</a>
+                    </div>
+                    
+                    <!-- Display login status -->
+                    <span id="account-status" class="ms-3">Checking login status...</span>
+
+                    <!-- Dark mode toggle -->
+                    <div class="ms-3">
                         <label class="theme-switch mb-0">
                             <input type="checkbox" id="theme-toggle">
                             <span class="slider round"></span>
