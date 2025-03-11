@@ -244,7 +244,9 @@ function createPin(color = "#4285F4") {
 
 // Function to check authentication status across all pages
 function checkAuthStatus() {
-    fetch('/.auth/me')
+    fetch('/.auth/me', {
+		credentials: 'include'  // Explicitly include cookies
+	})
         .then(response => response.json())
         .then(data => {
             if (data.length > 0) {
