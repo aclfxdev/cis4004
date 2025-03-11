@@ -204,44 +204,6 @@ function createWeatherCards(periods) {
     secondHalf.forEach(element => row2Container.appendChild(createCard(element)));
 }
 
-// ================= Google Maps Integration =================
-let map;
-let marker;
-
-function initMap() {
-    const initialLocation = { lat: 39.8283, lng: -98.5795 };
-    map = new google.maps.Map(document.getElementById("map"), {
-        center: initialLocation,
-        zoom: 4
-    });
-
-    map.addListener("click", (event) => {
-        const clickedLocation = event.latLng;
-        if (marker) {
-            marker.position = clickedLocation;
-        } else {
-            marker = new google.maps.marker.AdvancedMarkerElement({
-                position: clickedLocation,
-                map: map,
-                title: "Selected Location",
-                content: createPin("#4285F4")
-            });
-        }
-        const lat = clickedLocation.lat();
-        const lng = clickedLocation.lng();
-        getEndpoints(lat, lng);
-    });
-}
-
-// Helper function to create a pin using PinView
-function createPin(color = "#4285F4") {
-    const pinView = new google.maps.marker.PinView({
-        scale: 1,
-        background: color
-    });
-    return pinView.element;
-}
-
 // Function to check authentication status across all pages
 function checkAuthStatus() {
     fetch('/.auth/me', {
