@@ -244,17 +244,19 @@ function createPin(color = "#4285F4") {
 
 // Function to check authentication status across all pages
 function checkAuthStatus() {
-    fetch('/.auth/me', {
-		credentials: 'include'  // Explicitly include cookies
-	})
+    fetch('/.auth/me')
         .then(response => response.json())
         .then(data => {
-            if (data.length > 0) {
-                const user = data[0];
-                document.getElementById("account-status").innerText = "Signed in as " + user.user_id;
+            if (data.clientPrincipal) {
+                const user = data.clientPrincipal.userDetails;
+                localStorage.setItem("isAuthenticated", "true");
+                localStorage.setItem("userName", user);
+
+                document.getElementById("account-status").innerText = "Signed in as " + user;
                 document.getElementById("login-btn").style.display = "none";
                 document.getElementById("logout-btn").style.display = "inline-block";
             } else {
+                localStorage.setItem("isAuthenticated", "false");
                 document.getElementById("account-status").innerText = "Not signed in";
                 document.getElementById("login-btn").style.display = "inline-block";
                 document.getElementById("logout-btn").style.display = "none";
@@ -265,6 +267,45 @@ function checkAuthStatus() {
             document.getElementById("account-status").innerText = "Error checking login status";
         });
 }
+
+// Ensure authentication status is set on page load
+document.addEventListener("DOMContentLoaded", function () {
+    checkAuthStatus();
+
+    // Restore authentication state from localStorage if needed
+    const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
+    const userName = localStorage.getItem("userName");
+
+    if (isAuthenticated) {
+        document.getElementById("account-status").innerText = "Signed in as " + userName;
+        document.getElementById("login-btn").style.display = "none";
+        document.getElementById("logout-btn").style.display = "inline-block";
+    } else {
+        document.getElementById("account-status").innerText = "Not signed in";
+        document.getElementById("login-btn").style.display = "inline-block";
+        document.getElementById("logout-btn").style.display = "none";
+    }
+});
+
+
+// Ensure authentication status is set on page load
+document.addEventListener("DOMContentLoaded", function () {
+    checkAuthStatus();
+
+    // Restore authentication state from localStorage if needed
+    const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
+    const userName = localStorage.getItem("userName");
+
+    if (isAuthenticated) {
+        document.getElementById("account-status").innerText = "Signed in as " + userName;
+        document.getElementById("login-btn").style.display = "none";
+        document.getElementById("logout-btn").style.display = "inline-block";
+    } else {
+        document.getElementById("account-status").innerText = "Not signed in";
+        document.getElementById("login-btn").style.display = "inline-block";
+        document.getElementById("logout-btn").style.display = "none";
+    }
+});
 
 // Auth check and dynamically update login button redirect
 window.addEventListener('load', function() {
