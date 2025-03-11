@@ -247,16 +247,12 @@ function checkAuthStatus() {
     fetch('/.auth/me')
         .then(response => response.json())
         .then(data => {
-            if (data.clientPrincipal) {
-                const user = data.clientPrincipal.userDetails;
-                localStorage.setItem("isAuthenticated", "true");
-                localStorage.setItem("userName", user);
-
-                document.getElementById("account-status").innerText = "Signed in as " + user;
+            if (data.length > 0) {
+                const user = data[0];
+                document.getElementById("account-status").innerText = "Signed in as " + user.user_id;
                 document.getElementById("login-btn").style.display = "none";
                 document.getElementById("logout-btn").style.display = "inline-block";
             } else {
-                localStorage.setItem("isAuthenticated", "false");
                 document.getElementById("account-status").innerText = "Not signed in";
                 document.getElementById("login-btn").style.display = "inline-block";
                 document.getElementById("logout-btn").style.display = "none";
@@ -268,55 +264,5 @@ function checkAuthStatus() {
         });
 }
 
-// Ensure authentication status is set on page load
-document.addEventListener("DOMContentLoaded", function () {
-    checkAuthStatus();
-
-    // Restore authentication state from localStorage if needed
-    const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
-    const userName = localStorage.getItem("userName");
-
-    if (isAuthenticated) {
-        document.getElementById("account-status").innerText = "Signed in as " + userName;
-        document.getElementById("login-btn").style.display = "none";
-        document.getElementById("logout-btn").style.display = "inline-block";
-    } else {
-        document.getElementById("account-status").innerText = "Not signed in";
-        document.getElementById("login-btn").style.display = "inline-block";
-        document.getElementById("logout-btn").style.display = "none";
-    }
-});
-
-
-// Ensure authentication status is set on page load
-document.addEventListener("DOMContentLoaded", function () {
-    checkAuthStatus();
-
-    // Restore authentication state from localStorage if needed
-    const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
-    const userName = localStorage.getItem("userName");
-
-    if (isAuthenticated) {
-        document.getElementById("account-status").innerText = "Signed in as " + userName;
-        document.getElementById("login-btn").style.display = "none";
-        document.getElementById("logout-btn").style.display = "inline-block";
-    } else {
-        document.getElementById("account-status").innerText = "Not signed in";
-        document.getElementById("login-btn").style.display = "inline-block";
-        document.getElementById("logout-btn").style.display = "none";
-    }
-});
-
-// Auth check and dynamically update login button redirect
-window.addEventListener('load', function() {
-    // First, update the login button's redirect dynamically:
-    const loginBtn = document.getElementById("login-btn");
-    if (loginBtn) {
-        const currentPath = window.location.pathname;
-        loginBtn.href = "/.auth/login/google?post_login_redirect_uri=" + encodeURIComponent(currentPath);
-        console.log("Updated login btn href:", loginBtn.href);
-    }
-    
-    // Then, check the authentication status:
-    checkAuthStatus();
-});
+// Run authentication check on page load for all pages
+window.onload = checkAuthStatus;
