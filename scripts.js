@@ -1,79 +1,281 @@
-<!doctype html>
-<html>
-    <head>
-        <title>Weather Home Page</title>
-        <meta charset="UTF-8">
-        <meta name="description" content="Weather Forecasting">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+// MAIN SCRIPTS FILE.
 
-        <!-- Link stylesheet -->
-        <link rel="stylesheet" href="style/style.css">
+// --- Weather Icons Mapping ---
+// Maps keywords from the forecast condition to weather-icons CSS classes.
+const weatherIconClassMap = {
+    "Clear": "wi-day-sunny",
+    "Sunny": "wi-day-sunny",
+    "Mostly Sunny": "wi-day-sunny-overcast",
+    "Partly Cloudy": "wi-day-cloudy",
+    "Mostly Cloudy": "wi-cloudy",
+    "Cloudy": "wi-cloudy",
+    "Overcast": "wi-cloudy",
+    "Rain": "wi-day-rain",
+    "Showers": "wi-day-showers",
+    "Thunderstorm": "wi-day-thunderstorm",
+    "Snow": "wi-day-snow",
+    "Sleet": "wi-sleet",
+    "Fog": "wi-fog"
+};
 
-        <!-- Link Roboto font -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+function getWeatherIconClass(condition) {
+    for (const key in weatherIconClassMap) {
+        if (condition.indexOf(key) !== -1) {
+            return weatherIconClassMap[key];
+        }
+    }
+    return "wi-na";
+}
 
-        <!-- Link Weather icons -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.10/css/weather-icons.min.css">
+// Define the function to fetch with User-Agent
+function fetchWithUserAgent(url) {
+    const headers = {
+        "User-Agent": "CIS-4004 Weather Forecasting (ch797590@ucf.edu / ja939451@ucf.edu)",
+        "Accept": "application/json"
+    };
+
+    return fetch(url, { headers })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .catch(error => {
+            console.error("Error fetching data:", error);
+            throw error;
+        });
+}
+
+// ================= Cookie Helpers =================
+function setCookie(cname, cvalue, exdays) {
+    const d = new Date();
+    d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
+    const expires = "expires=" + d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+    const name = cname + "=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(";");
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i].trim();
+        if (c.indexOf(name) === 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+// ================= Dark Mode Functions (Cookie-Based) =================
+function applyTheme(theme) {
+    if (theme === "dark") {
+        document.body.classList.add("dark-mode");
+    } else {
+        document.body.classList.remove("dark-mode");
+    }
+}
+
+function initTheme() {
+    const themeCookie = getCookie("theme");
+    let theme;
+    if (themeCookie) {
+        theme = themeCookie;
+    } else {
+        const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        theme = prefersDark ? "dark" : "light";
+    }
+    applyTheme(theme);
+    const toggleSwitch = document.getElementById("theme-toggle");
+    if (toggleSwitch) {
+        toggleSwitch.checked = theme === "dark";
+        toggleSwitch.addEventListener("change", function () {
+            if (document.body.classList.contains("dark-mode")) {
+                document.body.classList.remove("dark-mode");
+                setCookie("theme", "light", 30);
+            } else {
+                document.body.classList.add("dark-mode");
+                setCookie("theme", "dark", 30);
+            }
+        });
+    }
+}
+
+document.addEventListener("DOMContentLoaded", initTheme);
+
+// ================= Geolocation =================
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            console.log(`%cLatitude: ${latitude}\nLongitude: ${longitude}`, "color: green");
+
+            // Fetch endpoints using latitude and longitude
+            getEndpoints(latitude, longitude);
+        },
+        (error) => {
+            console.error(`%cError getting location: ${error.message}`, "color:red");
+        }
+    );
+} else {
+    console.error("%cGeolocation is not supported by this browser!", "color: red");
+}
+
+// ================= Weather.gov API Functions =================
+async function getEndpoints(latitude, longitude) {
+    try {
+        const url = `https://api.weather.gov/points/${latitude},${longitude}`;
+        const data = await fetchWithUserAgent(url);
+
+        // Store hourly forecast URL from data
+        const hourlyForecastUrl = data.properties.forecastHourly;
+
+        // Fetch hourly weather forecast
+        getForecast(hourlyForecastUrl);
+    } catch (error) {
+        console.error(`%c${error.message}`, "color: red");
+    }
+}
+
+async function getForecast(hourlyForecastUrl) {
+    try {
+        const data = await fetchWithUserAgent(hourlyForecastUrl);
+        const periods = data.properties.periods;
+        const now = new Date();
+        const cutoff = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+        const filteredPeriods = periods.filter(period => {
+            const periodStart = new Date(period.startTime);
+            return periodStart >= now && periodStart <= cutoff;
+        });
+
+        console.log("Filtered periods:", filteredPeriods);
+        createWeatherCards(filteredPeriods);
+    } catch (error) {
+        console.error(`%c${error.message}`, "color: red");
+    }
+}
+
+function createWeatherCards(periods) {
+    const row1Container = document.getElementById("row-1");
+    const row2Container = document.getElementById("row-2");
+    row1Container.innerHTML = "";
+    row2Container.innerHTML = "";
+    const firstHalf = periods.slice(0, 12);
+    const secondHalf = periods.slice(12, 24);
+
+    function createCard(element) {
+        const div = document.createElement("div");
+        div.className = "card";
         
-        <!-- Link Bootstrap -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    </head>
-    <body class="roboto-font-user">
-        <nav class="navbar navbar-expand-lg bg-body-tertiary">
-            <div class="container-fluid">
-                <span class="navbar-brand mb-0 h1">CIS 4004 Weather App</span>
-                <!-- Navbar toggler for mobile -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <!-- Collapsible container for nav links, login/logout buttons, and dark mode toggle -->
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="index.html">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="forecast-map.html">Forecast Map</a>
-                        </li>
-                    </ul>
-                    
-                    <!-- Google Login / Logout Buttons -->
-                    <div id="auth-buttons">
-                        <a id="login-btn" href="/.auth/login/google?post_login_redirect_uri=/" class="btn btn-primary">Sign in with Google</a>
-                        <a id="logout-btn" href="/.auth/logout?post_logout_redirect_uri=/" class="btn btn-danger" style="display:none;">Sign Out</a>
-                    </div>
-                    
-                    <!-- Display login status -->
-                    <span id="account-status" class="ms-3">Checking login status...</span>
+        const h3 = document.createElement("h3");
+        const iconElem = document.createElement("i");
+        const p = document.createElement("p");
 
-                    <!-- Dark mode toggle -->
-                    <div class="ms-3">
-                        <label class="theme-switch mb-0">
-                            <input type="checkbox" id="theme-toggle">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </nav>
-        
-        <div class="container-fluid">
-            <br><br>
-            <h1>Future Forecast (24 hours)</h1>
-            <h4><em>For your location</em></h4>
-            <br>
-            <div id="card-container">
-                <div id="row-1" class="forecast-row"></div>
-                <div id="row-2" class="forecast-row"></div>
-            </div>
-        </div>
+        const iconClass = getWeatherIconClass(element.shortForecast);
+        iconElem.className = `wi ${iconClass}`;
+        iconElem.classList.add("wi-3x");
 
-        <!-- Include JavaScript for authentication and other scripts -->
-        <script src="scripts.js"></script>
+        const localTime = new Date(element.startTime).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true
+        });
+        h3.textContent = localTime;
 
-    </body>
-</html>
+        let tempText;
+        if (element.temperatureUnit === "F") {
+            const fahrenheit = element.temperature;
+            const celsius = Math.round((fahrenheit - 32) * 5 / 9);
+            tempText = `${fahrenheit}°F (${celsius}°C)`;
+        } else {
+            tempText = `${element.temperature}°${element.temperatureUnit}`;
+        }
+        p.innerHTML = `${element.shortForecast}<br>${tempText}`;
+
+        div.appendChild(h3);
+        div.appendChild(iconElem);
+        div.appendChild(p);
+        return div;
+    }
+
+    firstHalf.forEach(element => row1Container.appendChild(createCard(element)));
+    secondHalf.forEach(element => row2Container.appendChild(createCard(element)));
+}
+
+// ================= Google Maps Integration =================
+let map;
+let marker;
+
+function initMap() {
+    const initialLocation = { lat: 39.8283, lng: -98.5795 };
+    map = new google.maps.Map(document.getElementById("map"), {
+        center: initialLocation,
+        zoom: 4
+    });
+
+    map.addListener("click", (event) => {
+        const clickedLocation = event.latLng;
+        if (marker) {
+            marker.position = clickedLocation;
+        } else {
+            marker = new google.maps.marker.AdvancedMarkerElement({
+                position: clickedLocation,
+                map: map,
+                title: "Selected Location",
+                content: createPin("#4285F4")
+            });
+        }
+        const lat = clickedLocation.lat();
+        const lng = clickedLocation.lng();
+        getEndpoints(lat, lng);
+    });
+}
+
+// Helper function to create a pin using PinView
+function createPin(color = "#4285F4") {
+    const pinView = new google.maps.marker.PinView({
+        scale: 1,
+        background: color
+    });
+    return pinView.element;
+}
+
+// Function to check authentication status across all pages
+function checkAuthStatus() {
+    fetch('/.auth/me', {
+		credentials: 'include'  // Explicitly include cookies
+	})
+        .then(response => response.json())
+        .then(data => {
+            if (data.length > 0) {
+                const user = data[0];
+                document.getElementById("account-status").innerText = "Signed in as " + user.user_id;
+                document.getElementById("login-btn").style.display = "none";
+                document.getElementById("logout-btn").style.display = "inline-block";
+            } else {
+                document.getElementById("account-status").innerText = "Not signed in";
+                document.getElementById("login-btn").style.display = "inline-block";
+                document.getElementById("logout-btn").style.display = "none";
+            }
+        })
+        .catch(error => {
+            console.error("Error checking login status:", error);
+            document.getElementById("account-status").innerText = "Error checking login status";
+        });
+}
+
+// Auth check and dynamically update login button redirect
+window.addEventListener('load', function() {
+    // First, update the login button's redirect dynamically:
+    const loginBtn = document.getElementById("login-btn");
+    if (loginBtn) {
+        const currentPath = window.location.pathname;
+        loginBtn.href = "/.auth/login/google?post_login_redirect_uri=" + encodeURIComponent(currentPath);
+        console.log("Updated login btn href:", loginBtn.href);
+    }
+    
+    // Then, check the authentication status:
+    checkAuthStatus();
+});
