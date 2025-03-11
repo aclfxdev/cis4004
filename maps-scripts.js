@@ -1,61 +1,8 @@
-// Cookie helper functions
-function setCookie(cname, cvalue, exdays) {
-    const d = new Date();
-    d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
-    const expires = "expires=" + d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-}
+// ------------------ Consolidated maps-scripts.js ------------------
+// (Removed duplicate cookie helper and dark mode functions;
+//  those are now solely in scripts.js)
 
-function getCookie(cname) {
-    const name = cname + "=";
-    const decodedCookie = decodeURIComponent(document.cookie);
-    const ca = decodedCookie.split(";");
-    for (let i = 0; i < ca.length; i++) {
-        let c = ca[i].trim();
-        if (c.indexOf(name) === 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return "";
-}
-
-// Dark mode functions using cookies
-function applyTheme(theme) {
-    if (theme === "dark") {
-        document.body.classList.add("dark-mode");
-    } else {
-        document.body.classList.remove("dark-mode");
-    }
-}
-
-function initTheme() {
-    const themeCookie = getCookie("theme");
-    let theme;
-    if (themeCookie) {
-        theme = themeCookie;
-    } else {
-        const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-        theme = prefersDark ? "dark" : "light";
-    }
-    applyTheme(theme);
-    const toggleSwitch = document.getElementById("theme-toggle");
-    if (toggleSwitch) {
-        toggleSwitch.checked = theme === "dark";
-        toggleSwitch.addEventListener("change", function () {
-            if (document.body.classList.contains("dark-mode")) {
-                document.body.classList.remove("dark-mode");
-                setCookie("theme", "light", 30);
-            } else {
-                document.body.classList.add("dark-mode");
-                setCookie("theme", "dark", 30);
-            }
-        });
-    }
-}
-
-document.addEventListener("DOMContentLoaded", initTheme);
-
-// Weather Icons Mapping
+// ------------------ Weather Icons Mapping ------------------
 const weatherIconClassMap = {
     "Clear": "wi-day-sunny",
     "Sunny": "wi-day-sunny",
@@ -81,7 +28,7 @@ function getWeatherIconClass(condition) {
     return "wi-na";
 }
 
-// Function to fetch with User-Agent for weather.gov API requests
+// ------------------ Fetch with User-Agent ------------------
 function fetchWithUserAgent(url) {
     const headers = {
         "User-Agent": "CIS-4004 Weather Forecasting (ch797590@ucf.edu / ja939451@ucf.edu)",
@@ -101,15 +48,14 @@ function fetchWithUserAgent(url) {
         });
 }
 
-// Retrieve endpoints from weather.gov
+// ------------------ Weather.gov API Functions ------------------
 async function getEndpoints(latitude, longitude) {
     try {
         const url = `https://api.weather.gov/points/${latitude},${longitude}`;
         const data = await fetchWithUserAgent(url);
         
-        // NEW: Extract nearest city and state from relativeLocation
+        // Extract nearest city and state from relativeLocation
         const { city, state } = data.properties.relativeLocation.properties;
-        // Extract the radar station code
         const stationCode = data.properties.radarStation;
         
         // Update the location-info div with this information
@@ -118,7 +64,7 @@ async function getEndpoints(latitude, longitude) {
             locationInfoDiv.textContent = `Nearest City: ${city}, ${state} | Station: ${stationCode}`;
         }
         
-        // Retrieve the hourly forecast URL
+        // Retrieve the hourly forecast URL and fetch forecast
         const hourlyForecastUrl = data.properties.forecastHourly;
         getForecast(hourlyForecastUrl);
     } catch (error) {
@@ -126,7 +72,6 @@ async function getEndpoints(latitude, longitude) {
     }
 }
 
-// Get forecast data and filter for the next 24 hours
 async function getForecast(hourlyForecastUrl) {
     try {
         const data = await fetchWithUserAgent(hourlyForecastUrl);
@@ -191,7 +136,7 @@ function createWeatherCards(periods) {
     secondHalf.forEach(element => row2Container.appendChild(createCard(element)));
 }
 
-// Helper function to create a simple pin element
+// ------------------ Google Maps Integration ------------------
 function createPin(color = "#4285F4") {
     const pinDiv = document.createElement("div");
     pinDiv.style.width = "30px";
@@ -203,7 +148,6 @@ function createPin(color = "#4285F4") {
     return pinDiv;
 }
 
-// Google Maps Integration
 let map;
 let marker;
 
