@@ -293,6 +293,7 @@ function loadSavedLocations() {
             list.innerHTML = '';
             locations.forEach(loc => {
                 const item = document.createElement("li");
+                item.className = "list-group-item";
                 item.innerHTML = `<strong>${loc.location_name}</strong> (${loc.latitude}, ${loc.longitude})`;
                 item.style.cursor = "pointer";
                 item.addEventListener("click", () => getEndpoints(loc.latitude, loc.longitude));
@@ -342,4 +343,3 @@ function checkAuthStatus() {
             document.getElementById("account-status").innerText = "Error checking login status";
         });
 }
-});
