@@ -10,7 +10,7 @@ const weatherIconClassMap = {
     "Mostly Cloudy": "wi-cloudy",
     "Cloudy": "wi-cloudy",
     "Overcast": "wi-cloudy",
-    "Rain": "wi-day-rain",
+    "Rain": "wi-day-rain", 
     "Showers": "wi-day-showers",
     "Thunderstorm": "wi-day-thunderstorm",
     "Snow": "wi-day-snow",
