@@ -295,7 +295,6 @@ function loadSavedLocations() {
                 const item = document.createElement("li");
                 item.className = "list-group-item";
                 item.innerHTML = `<strong>${loc.location_name}</strong> (${loc.latitude}, ${loc.longitude})`;
-                item.style.cursor = "pointer";
                 item.addEventListener("click", () => getEndpoints(loc.latitude, loc.longitude));
                 list.appendChild(item);
             });
@@ -337,9 +336,5 @@ function checkAuthStatus() {
                 document.getElementById("login-btn").style.display = "inline-block";
                 document.getElementById("logout-btn").style.display = "none";
             }
-        })
-        .catch(error => {
-            console.error("Error checking login status:", error);
-            document.getElementById("account-status").innerText = "Error checking login status";
         });
 }
