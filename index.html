@@ -61,36 +61,19 @@
             </div>
         </nav>
         
-        <div class="container-fluid mt-4">
+        <div class="container-fluid">
+            <br><br>
             <h1>Future Forecast (24 hours)</h1>
             <h4><em>For your location</em></h4>
+            <br>
             <div id="card-container">
                 <div id="row-1" class="forecast-row"></div>
                 <div id="row-2" class="forecast-row"></div>
             </div>
         </div>
 
-        <!-- Saved Locations Section -->
-        <div class="container mt-5" id="saved-locations-container" style="display: none;">
-            <h3>Your Saved Locations</h3>
-            <form id="save-location-form" class="mb-3 row g-2 align-items-center">
-                <div class="col-auto">
-                    <input type="text" class="form-control" id="location-name" placeholder="Location name (e.g., Orlando)" required>
-                </div>
-                <div class="col-auto">
-                    <input type="number" step="any" class="form-control" id="latitude" placeholder="Latitude" required>
-                </div>
-                <div class="col-auto">
-                    <input type="number" step="any" class="form-control" id="longitude" placeholder="Longitude" required>
-                </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-success">Save Location</button>
-                </div>
-            </form>
-            <ul id="saved-locations-list" class="list-group"></ul>
-        </div>
-
-        <!-- Include JavaScript for authentication and weather logic -->
+        <!-- Include JavaScript for authentication and other scripts -->
         <script src="scripts.js"></script>
+
     </body>
 </html>
