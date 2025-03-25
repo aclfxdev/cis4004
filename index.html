@@ -72,6 +72,17 @@
             </div>
         </div>
 
+        <div class="container mt-5" id="saved-locations-container" style="display: none;">
+  <h3>Your Saved Locations</h3>
+  <form id="save-location-form">
+    <input type="text" id="location-name" placeholder="Name this location (e.g., Orlando)" required>
+    <input type="number" step="any" id="latitude" placeholder="Latitude" required>
+    <input type="number" step="any" id="longitude" placeholder="Longitude" required>
+    <button type="submit">Save Location</button>
+  </form>
+  <ul id="saved-locations-list"></ul>
+</div>
+
         <!-- Include JavaScript for authentication and other scripts -->
         <script src="scripts.js"></script>
 
