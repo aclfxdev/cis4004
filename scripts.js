@@ -1,4 +1,4 @@
- // MAIN SCRIPTS FILE.
+// MAIN SCRIPTS FILE.
 
 // --- Weather Icons Mapping ---
 // Maps keywords from the forecast condition to weather-icons CSS classes.
