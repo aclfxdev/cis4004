@@ -2,50 +2,56 @@ const express = require('express');
 const path = require('path');
 const mysql = require('mysql2');
 const bodyParser = require('body-parser');
+require('dotenv').config(); // Load from .env
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
 app.use(express.static(path.join(__dirname)));
 app.use(bodyParser.json());
 
-// MySQL config (replace with your actual Azure MySQL info)
+// MySQL Connection
 const db = mysql.createConnection({
-  host: 'your-azure-mysql-host',
-  user: 'your-db-user',
-  password: 'your-db-password',
-  database: 'your-database-name'
+  host: 'cis4004-server.mysql.database.azure.com',
+  user: 'borptpseaw@cis4004-server',
+  password: process.env.DB_PASSWORD,  // set this in Azure
+  database: 'weatherdb',
+  ssl: {
+    rejectUnauthorized: true
+  }
 });
 
 db.connect(err => {
-  if (err) throw err;
-  console.log("MySQL Connected!");
+  if (err) {
+    console.error("MySQL Connection Failed:", err.stack);
+    process.exit(1);
+  }
+  console.log("Connected to Azure MySQL!");
 });
 
 // API: Save location
 app.post('/api/locations', (req, res) => {
   const { user_id, location_name, latitude, longitude } = req.body;
-  const query = 'INSERT INTO saved_locations (user_id, location_name, latitude, longitude) VALUES (?, ?, ?, ?)';
-  db.query(query, [user_id, location_name, latitude, longitude], (err, result) => {
+  const sql = 'INSERT INTO saved_locations (user_id, location_name, latitude, longitude) VALUES (?, ?, ?, ?)';
+  db.query(sql, [user_id, location_name, latitude, longitude], (err, result) => {
     if (err) return res.status(500).send(err);
     res.status(201).json({ id: result.insertId });
   });
 });
 
-// API: Get saved locations for user
+// API: Get user locations
 app.get('/api/locations/:user_id', (req, res) => {
-  const query = 'SELECT * FROM saved_locations WHERE user_id = ? ORDER BY created_at DESC';
-  db.query(query, [req.params.user_id], (err, results) => {
+  const sql = 'SELECT * FROM saved_locations WHERE user_id = ? ORDER BY created_at DESC';
+  db.query(sql, [req.params.user_id], (err, results) => {
     if (err) return res.status(500).send(err);
     res.json(results);
   });
 });
 
-// Fallback
+// Fallback to index.html
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
