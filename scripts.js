@@ -278,4 +278,68 @@ window.addEventListener('load', function() {
     
     // Then, check the authentication status:
     checkAuthStatus();
+
+	let currentUserId = null;
+
+function showSavedLocationsSection() {
+    document.getElementById("saved-locations-container").style.display = "block";
+}
+
+function loadSavedLocations() {
+    fetch(`/api/locations/${currentUserId}`)
+        .then(res => res.json())
+        .then(locations => {
+            const list = document.getElementById("saved-locations-list");
+            list.innerHTML = '';
+            locations.forEach(loc => {
+                const item = document.createElement("li");
+                item.innerHTML = `<strong>${loc.location_name}</strong> (${loc.latitude}, ${loc.longitude})`;
+                item.style.cursor = "pointer";
+                item.addEventListener("click", () => getEndpoints(loc.latitude, loc.longitude));
+                list.appendChild(item);
+            });
+        });
+}
+
+document.getElementById("save-location-form")?.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const location_name = document.getElementById("location-name").value;
+    const latitude = parseFloat(document.getElementById("latitude").value);
+    const longitude = parseFloat(document.getElementById("longitude").value);
+
+    fetch("/api/locations", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: currentUserId, location_name, latitude, longitude })
+    }).then(() => {
+        loadSavedLocations();
+        e.target.reset();
+    });
+});
+
+function checkAuthStatus() {
+    fetch('/.auth/me', {
+        credentials: 'include'
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.length > 0) {
+                const user = data[0];
+                currentUserId = user.user_id;
+                document.getElementById("account-status").innerText = "Signed in as " + currentUserId;
+                document.getElementById("login-btn").style.display = "none";
+                document.getElementById("logout-btn").style.display = "inline-block";
+                showSavedLocationsSection();
+                loadSavedLocations();
+            } else {
+                document.getElementById("account-status").innerText = "Not signed in";
+                document.getElementById("login-btn").style.display = "inline-block";
+                document.getElementById("logout-btn").style.display = "none";
+            }
+        })
+        .catch(error => {
+            console.error("Error checking login status:", error);
+            document.getElementById("account-status").innerText = "Error checking login status";
+        });
+}
 });
