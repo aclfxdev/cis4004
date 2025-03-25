@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 const db = mysql.createConnection({
   host: 'cis4004-server.mysql.database.azure.com',
   user: 'borptpseaw@cis4004-server',
-  password: process.env.Admin.cis4004,
+  password: process.env.DB_PASSWORD,
   database: 'weatherdb',
   ssl: { rejectUnauthorized: true }
 });
