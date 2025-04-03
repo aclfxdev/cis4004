@@ -1,10 +1,52 @@
 const express = require('express');
 const path = require('path');
 const app = express();
+const mysql = require('mysql2');
+const bodyParser = require('body-parser');
 const PORT = process.env.PORT || 3000;
 
 // Serve static files from the root directory
 app.use(express.static(path.join(__dirname)));
+
+// bodyParser
+app.use(bodyParser.json());
+
+// DB connection
+const db = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ssl: { rejectUnauthorized: true }
+});
+
+db.connect(err => {
+  if (err) {
+    console.error('❌ MySQL connection failed:', err.stack);
+  } else {
+    console.log('✅ MySQL connected');
+  }
+});
+
+// Save location
+app.post('/api/locations', (req, res) => {
+  const { user_id, location_name, latitude, longitude } = req.body;
+  const sql = 'INSERT INTO saved_locations (user_id, location_name, latitude, longitude) VALUES (?, ?, ?, ?)';
+  db.query(sql, [user_id, location_name, latitude, longitude], (err, result) => {
+    if (err) return res.status(500).send(err);
+    res.status(201).json({ id: result.insertId });
+  });
+});
+
+// Get locations by user
+app.get('/api/locations/:user_id', (req, res) => {
+  const sql = 'SELECT * FROM saved_locations WHERE user_id = ? ORDER BY created_at DESC';
+  db.query(sql, [req.params.user_id], (err, results) => {
+    if (err) return res.status(500).send(err);
+    res.json(results);
+  });
+});
+
 
 // For all GET requests, send back index.html
 app.get('*', (req, res) => {
