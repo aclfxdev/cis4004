@@ -4,7 +4,7 @@
   "description": "Full-stack web application for UCF's CIS-4004 course",
   "main": "server.js",
   "scripts": {
-    "start": "scripts.js"
+    "start": "node scripts.js"
   },
   "engines": {
     "node": ">=22.x"
@@ -14,6 +14,6 @@
     "mysql2": "^3.6.0",
     "body-parser": "^1.20.2"
   },
-  "author": "Your Name",
+  "author": "Jack Miller & Charles Zuck",
   "license": "ISC"
 }
