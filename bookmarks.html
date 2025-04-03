@@ -1,29 +1,25 @@
 <!doctype html>
 <html>
-    <head> 
-        <title>Map Forecast</title>
-        
-        <meta charset="UTF-8">
-        <meta name="description" content="Pick a point on the map to get a 24 hour forecast">
+    <head>
+        <title>Bookmarks</title>
+        <meta charset="UTF-8"> 
+        <meta name="description" content="Weather Forecasting">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
-        <!-- Link existing stylesheet -->
+
+        <!-- Link stylesheet -->
         <link rel="stylesheet" href="style/style.css">
-        
-        <!-- Link maps-specific stylesheet -->
-        <link rel="stylesheet" href="style/maps-style.css">
-        
+
         <!-- Link Roboto font -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-        
+
         <!-- Link Weather icons -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.10/css/weather-icons.min.css">
         
         <!-- Link Bootstrap -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     </head>
     <body class="roboto-font-user">
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
@@ -41,16 +37,16 @@
                             <a class="nav-link" href="index.html">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page"  href="forecast-map.html">Forecast Map</a>
+                            <a class="nav-link" href="forecast-map.html">Forecast Map</a>
                         </li>
 						<li class="nav-item">
-                            <a class="nav-link" href="bookmarks.html">Bookmarks</a>
+                            <a class="nav-link active" aria-current="page" href="bookmarks.html">Bookmarks</a>
                         </li>
                     </ul>
                     
                     <!-- Google Login / Logout Buttons -->
                     <div id="auth-buttons">
-                        <a id="login-btn" href="/.auth/login/google?post_login_redirect_uri=/forecast-map.html" class="btn btn-primary">Sign in with Google</a>
+                        <a id="login-btn" href="/.auth/login/google?post_login_redirect_uri=/" class="btn btn-primary">Sign in with Google</a>
                         <a id="logout-btn" href="/.auth/logout?post_logout_redirect_uri=/" class="btn btn-danger" style="display:none;">Sign Out</a>
                     </div>
                     
@@ -70,25 +66,16 @@
         
         <div class="container-fluid">
             <br><br>
-            <h1>Google Maps Forecast</h1>
+            <h1>View your bookmarked locations!</h1>
             <br>
-            <h4><em>Pick a location within the US on the map to retrieve the forecast for that area.</em></h4>
-            <!-- Google Map Container -->
-            <div id="map"></div>
-            <!-- NEW: Location info below the map -->
-            <div id="location-info" style="margin: 1rem 0; text-align: center;">
-                <!-- Nearest city and station info will be displayed here -->
-            </div>
-            <!-- Forecast Container -->
             <div id="card-container">
                 <div id="row-1" class="forecast-row"></div>
                 <div id="row-2" class="forecast-row"></div>
             </div>
         </div>
 
-        <!-- Load custom maps script -->
-        <script src="maps-scripts.js"></script>
-        <!-- Load the Google Maps API with your key -->
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDvjMyPKP-65HztP0Eyy7UCZ1s25I98DV0&libraries=marker&callback=initMap"></script>
+        <!-- Include JavaScript for authentication and other scripts -->
+        <script src="scripts.js"></script>
+
     </body>
 </html>
