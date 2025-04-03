@@ -3,7 +3,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Serve static files from the root directory 
+// Serve static files from the root directory
 app.use(express.static(path.join(__dirname)));
 
 // For all GET requests, send back index.html
