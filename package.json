@@ -4,7 +4,7 @@
   "description": "Full-stack web application for UCF's CIS-4004 course",
   "main": "server.js",
   "scripts": {
-    "start": "node scripts.js"
+    "start": "node server.js"
   },
   "engines": {
     "node": ">=22.x"
