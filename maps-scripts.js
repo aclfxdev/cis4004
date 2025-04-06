@@ -314,7 +314,7 @@ document.getElementById("bookmark-btn")?.addEventListener("click", () => {
 .catch(err => {
     console.error("❌ Bookmark save failed:", err);
     alert("❌ Failed to save location.");
+    });
 });
-
 
 
