@@ -340,3 +340,65 @@ function checkAuthStatus() {
         });
 }
 
+function loadBookmarks() {
+    if (!currentUserId) return;
+
+    fetch(`/api/locations/${currentUserId}`)
+        .then(res => res.json())
+        .then(locations => {
+            const container = document.getElementById("saved-locations-list");
+            container.innerHTML = '';
+            locations.forEach(loc => {
+                const section = document.createElement("div");
+                section.className = "col";
+                section.innerHTML = `<h5>${loc.location_name}</h5>
+                                     <p>${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)}</p>
+                                     <div class="forecast-display" id="forecast-${loc.id}"></div>`;
+                container.appendChild(section);
+
+                // Fetch and display forecast for each location
+                getEndpointsForBookmarks(loc.latitude, loc.longitude, `forecast-${loc.id}`);
+            });
+        });
+}
+
+function getEndpointsForBookmarks(lat, lng, containerId) {
+    fetchWithUserAgent(`https://api.weather.gov/points/${lat},${lng}`)
+        .then(data => {
+            const hourlyUrl = data.properties.forecastHourly;
+            return fetchWithUserAgent(hourlyUrl);
+        })
+        .then(data => {
+            const now = new Date();
+            const cutoff = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+            const periods = data.properties.periods.filter(period => {
+                const time = new Date(period.startTime);
+                return time >= now && time <= cutoff;
+            });
+
+            const container = document.getElementById(containerId);
+            if (container) {
+                periods.forEach(p => {
+                    const card = document.createElement("div");
+                    card.className = "mini-card";
+                    const iconClass = getWeatherIconClass(p.shortForecast);
+                    card.innerHTML = `
+                        <strong>${new Date(p.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong><br>
+                        <i class="wi ${iconClass} wi-2x"></i><br>
+                        ${p.shortForecast}<br>
+                        ${p.temperature}°${p.temperatureUnit}`;
+                    container.appendChild(card);
+                });
+            }
+        })
+        .catch(err => {
+            console.error("Error loading forecast for saved location:", err);
+        });
+}
+
+if (window.location.pathname.includes("bookmarks.html")) {
+    loadBookmarks();
+}
+
+
+
