@@ -160,6 +160,12 @@ async function getForecast(hourlyForecastUrl) {
 function createWeatherCards(periods) {
     const row1Container = document.getElementById("row-1");
     const row2Container = document.getElementById("row-2");
+
+    if (!row1Container || !row2Container) {
+        console.warn("⚠️ Forecast containers not found.");
+        return;
+    }
+
     row1Container.innerHTML = "";
     row2Container.innerHTML = "";
     const firstHalf = periods.slice(0, 12);
