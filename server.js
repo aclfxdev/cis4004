@@ -30,6 +30,8 @@ db.connect(err => {
 
 // Save location
 app.post('/api/locations', (req, res) => {
+  console.log("📥 Incoming POST /api/locations:", req.body); // ← ADD THIS
+
   const { user_id, location_name, latitude, longitude } = req.body;
 
   if (!user_id || !location_name || latitude === undefined || longitude === undefined) {
@@ -40,13 +42,15 @@ app.post('/api/locations', (req, res) => {
   const sql = 'INSERT INTO saved_locations (user_id, location_name, latitude, longitude) VALUES (?, ?, ?, ?)';
   db.query(sql, [user_id, location_name, latitude, longitude], (err, result) => {
     if (err) {
-      console.error("❌ DB insert failed:", err);
+      console.error("❌ DB insert failed:", err); // ← MAKE SURE THIS STAYS
       return res.status(500).json({ error: 'DB insert failed', details: err });
     }
 
+    console.log("✅ Bookmark saved with ID:", result.insertId);
     res.status(201).json({ id: result.insertId });
   });
 });
+
 
 
 // Get locations by user
