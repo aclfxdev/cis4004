@@ -300,12 +300,23 @@ document.getElementById("bookmark-btn")?.addEventListener("click", () => {
             latitude: selectedLat,
             longitude: selectedLng
         })
-    }).then(() => {
+    })
+    .then(async res => {
+        if (!res.ok) {
+            const text = await res.text();
+            console.error("❌ Server responded with error:", res.status, text);
+            throw new Error(text);
+        }
+        return res.json();
+    })
+    .then(() => {
         alert("✅ Location bookmarked!");
         document.getElementById("bookmark-button-container").style.display = "none";
-    }).catch((err) => {
-        console.error("Failed to save bookmark:", err);
+    })
+    .catch(err => {
+        console.error("❌ Bookmark save failed:", err);
         alert("❌ Failed to save location.");
     });
 });
+
 
