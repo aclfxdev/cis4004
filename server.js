@@ -62,15 +62,14 @@ app.get('/api/locations/:user_id', (req, res) => {
   });
 });
 
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
 // Only serve index.html for non-API routes
 app.get('*', (req, res, next) => {
   if (req.path.startsWith('/api')) {
     return next(); // don't hijack API calls
   }
   res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
 });
