@@ -357,12 +357,14 @@ function loadBookmarks() {
             locations.forEach(loc => {
                 const section = document.createElement("div");
                 section.className = "col";
-                section.innerHTML = `<h5>${loc.location_name}</h5>
-                                     <p>${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)}</p>
-                                     <div class="forecast-display" id="forecast-${loc.id}"></div>`;
+                section.innerHTML = `
+                    <h5>${loc.location_name}</h5>
+                    <p>${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)}</p>
+                    <div class="forecast-display" id="forecast-${loc.id}"></div>
+                `;
                 container.appendChild(section);
 
-                // Fetch and display forecast for each location
+                // ✅ Use the special bookmark-safe forecast loader
                 getEndpointsForBookmarks(loc.latitude, loc.longitude, `forecast-${loc.id}`);
             });
         });
@@ -383,19 +385,22 @@ function getEndpointsForBookmarks(lat, lng, containerId) {
             });
 
             const container = document.getElementById(containerId);
-            if (container) {
-                periods.forEach(p => {
-                    const card = document.createElement("div");
-                    card.className = "mini-card";
-                    const iconClass = getWeatherIconClass(p.shortForecast);
-                    card.innerHTML = `
-                        <strong>${new Date(p.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong><br>
-                        <i class="wi ${iconClass} wi-2x"></i><br>
-                        ${p.shortForecast}<br>
-                        ${p.temperature}°${p.temperatureUnit}`;
-                    container.appendChild(card);
-                });
+            if (!container) {
+                console.warn("⚠️ Missing container:", containerId);
+                return;
             }
+
+            periods.forEach(p => {
+                const card = document.createElement("div");
+                card.className = "mini-card";
+                const iconClass = getWeatherIconClass(p.shortForecast);
+                card.innerHTML = `
+                    <strong>${new Date(p.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong><br>
+                    <i class="wi ${iconClass} wi-2x"></i><br>
+                    ${p.shortForecast}<br>
+                    ${p.temperature}°${p.temperatureUnit}`;
+                container.appendChild(card);
+            });
         })
         .catch(err => {
             console.error("Error loading forecast for saved location:", err);
@@ -403,8 +408,10 @@ function getEndpointsForBookmarks(lat, lng, containerId) {
 }
 
 if (window.location.pathname.includes("bookmarks.html")) {
-    loadBookmarks();
+    checkAuthStatus(); // ensures currentUserId is set
+    loadBookmarks();   // loads and renders forecasts
 }
+
 
 
 
