@@ -292,31 +292,29 @@ document.getElementById("bookmark-btn")?.addEventListener("click", () => {
     if (!locationName) return;
 
     fetch("/api/locations", {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            user_id: currentUserId,
-            location_name: locationName,
-            latitude: selectedLat,
-            longitude: selectedLng
-        })
+    method: "POST",
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        user_id: currentUserId,
+        location_name: locationName,
+        latitude: selectedLat,
+        longitude: selectedLng
     })
-    .then(async res => {
-        if (!res.ok) {
-            const text = await res.text();
-            console.error("❌ Server responded with error:", res.status, text);
-            throw new Error(text);
-        }
-        return res.json();
-    })
-    .then(() => {
-        alert("✅ Location bookmarked!");
-        document.getElementById("bookmark-button-container").style.display = "none";
-    })
-    .catch(err => {
-        console.error("❌ Bookmark save failed:", err);
-        alert("❌ Failed to save location.");
-    });
+})
+.then(async res => {
+    const text = await res.text();
+    if (!res.ok) {
+        console.error("❌ Server error:", res.status, text);
+        throw new Error(text);
+    }
+    console.log("✅ Bookmark saved:", text);
+    alert("✅ Location bookmarked!");
+    document.getElementById("bookmark-button-container").style.display = "none";
+})
+.catch(err => {
+    console.error("❌ Bookmark save failed:", err);
+    alert("❌ Failed to save location.");
 });
+
 
 
