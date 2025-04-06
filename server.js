@@ -11,6 +11,8 @@ app.use(express.static(path.join(__dirname)));
 // bodyParser
 app.use(bodyParser.json());
 
+app.use(express.json()); // This enables parsing of JSON POST requests
+
 // DB connection
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
