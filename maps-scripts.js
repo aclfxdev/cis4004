@@ -269,10 +269,5 @@ window.addEventListener('load', function() {
         console.log("Updated login btn href:", loginBtn.href);
     }
     
-    // Then, check the authentication status:
-window.onload = () => {
     checkAuthStatus();
-    initMap();
 };
-
-});
