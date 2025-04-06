@@ -1,3 +1,8 @@
+let currentUserId = null;
+let selectedLat = null;
+let selectedLng = null;
+
+
 // Cookie helper functions
 function setCookie(cname, cvalue, exdays) {
     const d = new Date();
@@ -230,6 +235,7 @@ function initMap() {
         const lat = clickedLocation.lat();
         const lng = clickedLocation.lng();
         getEndpoints(lat, lng);
+	updateBookmarkButtonVisibility();
     });
 }
 
@@ -245,7 +251,7 @@ function checkAuthStatus() {
                 document.getElementById("account-status").innerText = "Signed in as " + user.user_id;
                 document.getElementById("login-btn").style.display = "none";
                 document.getElementById("logout-btn").style.display = "inline-block";
-		document.getElementById("bookmark-button-container").style.display = "block";
+		updateBookmarkButtonVisibility();
             } else {
                 document.getElementById("account-status").innerText = "Not signed in";
                 document.getElementById("login-btn").style.display = "inline-block";
@@ -257,7 +263,17 @@ function checkAuthStatus() {
             console.error("Error checking login status:", error);
             document.getElementById("account-status").innerText = "Error checking login status";
         });
+}  
+
+function updateBookmarkButtonVisibility() {
+    const container = document.getElementById("bookmark-button-container");
+    if (currentUserId && selectedLat !== null && selectedLng !== null) {
+        container.style.display = "block";
+    } else {
+        container.style.display = "none";
+    }
 }
+
 
 // Auth check and dynamically update login button redirect
 window.addEventListener('load', function() {
