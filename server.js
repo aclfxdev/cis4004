@@ -31,12 +31,23 @@ db.connect(err => {
 // Save location
 app.post('/api/locations', (req, res) => {
   const { user_id, location_name, latitude, longitude } = req.body;
+
+  if (!user_id || !location_name || latitude === undefined || longitude === undefined) {
+    console.log("❌ Missing data in request:", req.body);
+    return res.status(400).json({ error: 'Missing required data' });
+  }
+
   const sql = 'INSERT INTO saved_locations (user_id, location_name, latitude, longitude) VALUES (?, ?, ?, ?)';
   db.query(sql, [user_id, location_name, latitude, longitude], (err, result) => {
-    if (err) return res.status(500).send(err);
+    if (err) {
+      console.error("❌ DB insert failed:", err);
+      return res.status(500).json({ error: 'DB insert failed', details: err });
+    }
+
     res.status(201).json({ id: result.insertId });
   });
 });
+
 
 // Get locations by user
 app.get('/api/locations/:user_id', (req, res) => {
