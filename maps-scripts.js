@@ -270,4 +270,4 @@ window.addEventListener('load', function() {
     }
     
     checkAuthStatus();
-};
+});
