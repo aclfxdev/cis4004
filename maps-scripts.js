@@ -245,10 +245,12 @@ function checkAuthStatus() {
                 document.getElementById("account-status").innerText = "Signed in as " + user.user_id;
                 document.getElementById("login-btn").style.display = "none";
                 document.getElementById("logout-btn").style.display = "inline-block";
+		document.getElementById("bookmark-button-container").style.display = "block";
             } else {
                 document.getElementById("account-status").innerText = "Not signed in";
                 document.getElementById("login-btn").style.display = "inline-block";
                 document.getElementById("logout-btn").style.display = "none";
+		document.getElementById("bookmark-button-container").style.display = "none";
             }
         })
         .catch(error => {
@@ -268,5 +270,9 @@ window.addEventListener('load', function() {
     }
     
     // Then, check the authentication status:
+window.onload = () => {
     checkAuthStatus();
+    initMap();
+};
+
 });
