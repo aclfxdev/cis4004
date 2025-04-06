@@ -2,7 +2,6 @@ let currentUserId = null;
 let selectedLat = null;
 let selectedLng = null;
 
-
 // Cookie helper functions
 function setCookie(cname, cvalue, exdays) {
     const d = new Date();
@@ -111,19 +110,15 @@ async function getEndpoints(latitude, longitude) {
     try {
         const url = `https://api.weather.gov/points/${latitude},${longitude}`;
         const data = await fetchWithUserAgent(url);
-        
-        // NEW: Extract nearest city and state from relativeLocation
+
         const { city, state } = data.properties.relativeLocation.properties;
-        // Extract the radar station code
         const stationCode = data.properties.radarStation;
-        
-        // Update the location-info div with this information
+
         const locationInfoDiv = document.getElementById("location-info");
         if (locationInfoDiv) {
             locationInfoDiv.textContent = `Nearest City: ${city}, ${state} | Station: ${stationCode}`;
         }
-        
-        // Retrieve the hourly forecast URL
+
         const hourlyForecastUrl = data.properties.forecastHourly;
         getForecast(hourlyForecastUrl);
     } catch (error) {
@@ -142,7 +137,6 @@ async function getForecast(hourlyForecastUrl) {
             const periodStart = new Date(period.startTime);
             return periodStart >= now && periodStart <= cutoff;
         });
-        console.log("Filtered periods:", filteredPeriods);
         createWeatherCards(filteredPeriods);
     } catch (error) {
         console.error(`%c${error.message}`, "color: red");
@@ -160,7 +154,7 @@ function createWeatherCards(periods) {
     function createCard(element) {
         const div = document.createElement("div");
         div.className = "card";
-        
+
         const h3 = document.createElement("h3");
         const iconElem = document.createElement("i");
         const p = document.createElement("p");
@@ -232,38 +226,45 @@ function initMap() {
                 content: createPin("#4285F4")
             });
         }
-        const lat = clickedLocation.lat();
-        const lng = clickedLocation.lng();
-        getEndpoints(lat, lng);
-	updateBookmarkButtonVisibility();
+
+        selectedLat = clickedLocation.lat();
+        selectedLng = clickedLocation.lng();
+
+        getEndpoints(selectedLat, selectedLng);
+        updateBookmarkButtonVisibility();
     });
 }
 
-// Function to check authentication status across all pages
 function checkAuthStatus() {
     fetch('/.auth/me', {
-		credentials: 'include'  // Explicitly include cookies
-	})
+        credentials: 'include'
+    })
         .then(response => response.json())
         .then(data => {
             if (data.length > 0) {
                 const user = data[0];
+                currentUserId = user.user_id;
                 document.getElementById("account-status").innerText = "Signed in as " + user.user_id;
                 document.getElementById("login-btn").style.display = "none";
                 document.getElementById("logout-btn").style.display = "inline-block";
-		updateBookmarkButtonVisibility();
             } else {
+                currentUserId = null;
                 document.getElementById("account-status").innerText = "Not signed in";
                 document.getElementById("login-btn").style.display = "inline-block";
                 document.getElementById("logout-btn").style.display = "none";
-		document.getElementById("bookmark-button-container").style.display = "none";
+                selectedLat = null;
+                selectedLng = null;
             }
+
+            updateBookmarkButtonVisibility();
         })
         .catch(error => {
             console.error("Error checking login status:", error);
             document.getElementById("account-status").innerText = "Error checking login status";
+            currentUserId = null;
+            updateBookmarkButtonVisibility();
         });
-}  
+}
 
 function updateBookmarkButtonVisibility() {
     const container = document.getElementById("bookmark-button-container");
@@ -274,16 +275,12 @@ function updateBookmarkButtonVisibility() {
     }
 }
 
-
-// Auth check and dynamically update login button redirect
-window.addEventListener('load', function() {
-    // First, update the login button's redirect dynamically:
+window.addEventListener('load', function () {
     const loginBtn = document.getElementById("login-btn");
     if (loginBtn) {
         const currentPath = window.location.pathname;
         loginBtn.href = "/.auth/login/google?post_login_redirect_uri=" + encodeURIComponent(currentPath);
-        console.log("Updated login btn href:", loginBtn.href);
     }
-    
+
     checkAuthStatus();
 });
