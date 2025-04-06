@@ -32,28 +32,26 @@ db.connect(err => {
 
 // Save location
 app.post('/api/locations', (req, res) => {
-  console.log("📥 Incoming POST /api/locations:", req.body); // ← ADD THIS
+  console.log("📥 Received POST /api/locations with body:", req.body);
 
   const { user_id, location_name, latitude, longitude } = req.body;
 
   if (!user_id || !location_name || latitude === undefined || longitude === undefined) {
-    console.log("❌ Missing data in request:", req.body);
+    console.log("❌ Missing required fields:", req.body);
     return res.status(400).json({ error: 'Missing required data' });
   }
 
   const sql = 'INSERT INTO saved_locations (user_id, location_name, latitude, longitude) VALUES (?, ?, ?, ?)';
   db.query(sql, [user_id, location_name, latitude, longitude], (err, result) => {
     if (err) {
-      console.error("❌ DB insert failed:", err); // ← MAKE SURE THIS STAYS
-      return res.status(500).json({ error: 'DB insert failed', details: err });
+      console.error("❌ MySQL INSERT failed:", err);
+      return res.status(500).json({ error: 'DB error', details: err });
     }
 
-    console.log("✅ Bookmark saved with ID:", result.insertId);
+    console.log("✅ Bookmark inserted:", result.insertId);
     res.status(201).json({ id: result.insertId });
   });
 });
-
-
 
 // Get locations by user
 app.get('/api/locations/:user_id', (req, res) => {
