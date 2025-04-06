@@ -284,3 +284,28 @@ window.addEventListener('load', function () {
 
     checkAuthStatus();
 });
+
+document.getElementById("bookmark-btn")?.addEventListener("click", () => {
+    if (!selectedLat || !selectedLng || !currentUserId) return;
+
+    const locationName = prompt("Enter a name for this location:");
+    if (!locationName) return;
+
+    fetch("/api/locations", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            user_id: currentUserId,
+            location_name: locationName,
+            latitude: selectedLat,
+            longitude: selectedLng
+        })
+    }).then(() => {
+        alert("✅ Location bookmarked!");
+        document.getElementById("bookmark-button-container").style.display = "none";
+    }).catch((err) => {
+        console.error("Failed to save bookmark:", err);
+        alert("❌ Failed to save location.");
+    });
+});
+
