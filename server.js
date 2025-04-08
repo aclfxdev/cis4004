@@ -14,21 +14,40 @@ app.use(bodyParser.json());
 app.use(express.json()); // This enables parsing of JSON POST requests
 
 // DB connection
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  ssl: { rejectUnauthorized: true }
-});
+const mysql = require('mysql2');
 
-db.connect(err => {
-  if (err) {
-    console.error('❌ MySQL connection failed:', err.stack);
-  } else {
-    console.log('✅ MySQL connected');
-  }
-});
+let db;
+
+function handleDisconnect() {
+  db = mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
+  });
+
+  db.connect(err => {
+    if (err) {
+      console.error("❌ MySQL connection error:", err);
+      setTimeout(handleDisconnect, 2000); // Retry after 2 sec
+    } else {
+      console.log("✅ MySQL connected.");
+    }
+  });
+
+  db.on('error', err => {
+    console.error("❗ MySQL error:", err);
+    if (err.code === 'PROTOCOL_CONNECTION_LOST' || err.fatal) {
+      console.log("🔁 Attempting to reconnect...");
+      handleDisconnect();
+    } else {
+      throw err;
+    }
+  });
+}
+
+handleDisconnect(); // Start initial connection
+
 
 // Save location
 app.post('/api/locations', (req, res) => {
