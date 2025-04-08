@@ -356,15 +356,13 @@ function loadBookmarks() {
       container.innerHTML = '';
       locations.forEach(loc => {
         const section = document.createElement("div");
-        section.className = "col mb-4";
+        section.className = "col";
         section.innerHTML = `
           <h5>${loc.location_name}</h5>
           <p>(${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)})</p>
-          <div class="forecast-display row row-cols-2 row-cols-md-4 g-3" id="forecast-${loc.id}"></div>
+          <div id="forecast-${loc.id}" class="row forecast-card-container"></div>
         `;
         container.appendChild(section);
-
-        // Fetch and display weather forecast
         getEndpointsForBookmarks(loc.latitude, loc.longitude, `forecast-${loc.id}`);
       });
     })
@@ -388,25 +386,37 @@ function getEndpointsForBookmarks(lat, lng, containerId) {
       });
 
       const container = document.getElementById(containerId);
-      if (container) {
-        container.innerHTML = ''; // Clear previous if reloading
-        periods.forEach(p => {
-          const card = document.createElement("div");
-          card.className = "mini-card p-2 border rounded text-center";
-          const iconClass = getWeatherIconClass(p.shortForecast);
-          card.innerHTML = `
-            <strong>${new Date(p.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong><br>
-            <i class="wi ${iconClass} wi-2x"></i><br>
-            ${p.shortForecast}<br>
-            ${p.temperature}°${p.temperatureUnit}`;
-          container.appendChild(card);
+      if (!container) return;
+
+      // Create weather cards like forecast-map page
+      periods.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "card col-md-3 m-2 p-2 text-center";
+
+        const icon = getWeatherIconClass(p.shortForecast);
+        const time = new Date(p.startTime).toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
         });
-      }
+
+        const iconElem = `<i class="wi ${icon} wi-3x"></i>`;
+        const tempText = `${p.temperature}°${p.temperatureUnit}`;
+
+        card.innerHTML = `
+          <h5>${time}</h5>
+          ${iconElem}
+          <p>${p.shortForecast}<br>${tempText}</p>
+        `;
+
+        container.appendChild(card);
+      });
     })
     .catch(err => {
       console.error("❌ Forecast load failed:", err);
     });
 }
+
 
 
 if (window.location.pathname.includes("bookmarks.html")) {
