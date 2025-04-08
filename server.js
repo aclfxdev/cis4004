@@ -14,37 +14,23 @@ app.use(bodyParser.json());
 app.use(express.json()); // This enables parsing of JSON POST requests
 
 // DB connection
-let db;
+const db = mysql.createPool({
+  connectionLimit: 10, // Set this based on your MySQL server limits (10 is safe for most Azure tiers)
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
+});
 
-function handleDisconnect() {
-  db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME
-  });
+db.getConnection((err, connection) => {
+  if (err) {
+    console.error("❌ MySQL pool connection error:", err);
+  } else {
+    console.log("✅ Connected to MySQL using connection pool.");
+    connection.release(); // always release when checking
+  }
+});
 
-  db.connect(err => {
-    if (err) {
-      console.error("❌ MySQL connection error:", err);
-      setTimeout(handleDisconnect, 2000); // Retry after 2 sec
-    } else {
-      console.log("✅ MySQL connected.");
-    }
-  });
-
-  db.on('error', err => {
-    console.error("❗ MySQL error:", err);
-    if (err.code === 'PROTOCOL_CONNECTION_LOST' || err.fatal) {
-      console.log("🔁 Attempting to reconnect...");
-      handleDisconnect();
-    } else {
-      throw err;
-    }
-  });
-}
-
-handleDisconnect(); // Start initial connection
 
 
 // Save location
