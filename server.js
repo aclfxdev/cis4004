@@ -14,8 +14,6 @@ app.use(bodyParser.json());
 app.use(express.json()); // This enables parsing of JSON POST requests
 
 // DB connection
-const mysql = require('mysql2');
-
 let db;
 
 function handleDisconnect() {
