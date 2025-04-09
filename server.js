@@ -68,6 +68,20 @@ app.get('/api/locations/:user_id', (req, res) => {
   });
 });
 
+app.delete('/api/locations/:id', (req, res) => {
+  const bookmarkId = req.params.id;
+  const sql = 'DELETE FROM saved_locations WHERE id = ?';
+
+  db.query(sql, [bookmarkId], (err, result) => {
+    if (err) {
+      console.error("❌ Error deleting bookmark:", err);
+      return res.status(500).json({ error: 'Failed to delete bookmark' });
+    }
+    res.json({ message: 'Bookmark deleted successfully' });
+  });
+});
+
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
