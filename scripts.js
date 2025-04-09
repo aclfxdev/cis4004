@@ -388,34 +388,49 @@ function getEndpointsForBookmarks(lat, lng, containerId) {
       const container = document.getElementById(containerId);
       if (!container) return;
 
-      // Create weather cards like forecast-map page
-      periods.forEach(p => {
+      // Clear existing content
+      container.innerHTML = `
+        <div class="forecast-row" id="${containerId}-row1"></div>
+        <div class="forecast-row" id="${containerId}-row2"></div>
+      `;
+
+      const row1 = document.getElementById(`${containerId}-row1`);
+      const row2 = document.getElementById(`${containerId}-row2`);
+
+      periods.forEach((p, index) => {
+        const row = index < 12 ? row1 : row2;
+
         const card = document.createElement("div");
-        card.className = "card col-md-3 m-2 p-2 text-center";
+        card.className = "card";
 
         const icon = getWeatherIconClass(p.shortForecast);
+        const iconElem = `<i class="wi ${icon} wi-3x"></i>`;
         const time = new Date(p.startTime).toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
+          hour: "2-digit",
+          minute: "2-digit",
           hour12: true
         });
 
-        const iconElem = `<i class="wi ${icon} wi-3x"></i>`;
-        const tempText = `${p.temperature}°${p.temperatureUnit}`;
+        let tempText = `${p.temperature}°${p.temperatureUnit}`;
+        if (p.temperatureUnit === "F") {
+          const celsius = Math.round((p.temperature - 32) * 5 / 9);
+          tempText += ` (${celsius}°C)`;
+        }
 
         card.innerHTML = `
-          <h5>${time}</h5>
+          <h3>${time}</h3>
           ${iconElem}
           <p>${p.shortForecast}<br>${tempText}</p>
         `;
 
-        container.appendChild(card);
+        row.appendChild(card);
       });
     })
     .catch(err => {
       console.error("❌ Forecast load failed:", err);
     });
 }
+
 
 
 
