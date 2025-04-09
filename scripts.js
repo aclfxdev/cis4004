@@ -347,69 +347,96 @@ function checkAuthStatus() {
 }
 
 function loadBookmarks() {
-    if (!currentUserId) return;
+  if (!currentUserId) return;
 
-    fetch(`/api/locations/${currentUserId}`)
-        .then(res => res.json())
-        .then(locations => {
-            const container = document.getElementById("saved-locations-list");
-            container.innerHTML = '';
+  fetch(`/api/locations/${currentUserId}`)
+    .then(res => res.json())
+    .then(locations => {
+      const container = document.getElementById("saved-locations-list");
+      container.innerHTML = '';
 
-            locations.forEach(loc => {
-                const wrapper = document.createElement("div");
-                wrapper.className = "col";
+      locations.forEach(loc => {
+        const section = document.createElement("div");
+        section.className = "col";
 
-                wrapper.innerHTML = `
-                    <div class="card p-3 shadow-sm">
-                        <h4>${loc.location_name}</h4>
-                        <p><em>(${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)})</em></p>
-                        <div id="info-${loc.id}" class="mb-2 text-muted small"></div>
-                        <div id="card-container-${loc.id}">
-                            <div id="row-1-${loc.id}" class="forecast-row d-flex flex-wrap justify-content-start"></div>
-                            <div id="row-2-${loc.id}" class="forecast-row d-flex flex-wrap justify-content-start"></div>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(wrapper);
+        // Unique IDs
+        const cityStationId = `location-info-${loc.id}`;
+        const row1Id = `row1-${loc.id}`;
+        const row2Id = `row2-${loc.id}`;
 
-                getEndpointsForBookmark(loc.latitude, loc.longitude, loc.id);
-            });
-        })
-        .catch(err => {
-            console.error("❌ Error loading bookmarks:", err);
-        });
+        section.innerHTML = `
+          <h5>${loc.location_name} (${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)})</h5>
+          <p id="${cityStationId}" class="text-muted mb-2">Loading location details...</p>
+          <div id="${row1Id}" class="forecast-row d-flex flex-wrap"></div>
+          <div id="${row2Id}" class="forecast-row d-flex flex-wrap mt-2"></div>
+        `;
+
+        container.appendChild(section);
+        getEndpointsForBookmark(loc.latitude, loc.longitude, cityStationId, row1Id, row2Id);
+      });
+    })
+    .catch(err => {
+      console.error("❌ Error loading bookmarks:", err);
+    });
 }
 
-function getEndpointsForBookmark(lat, lng, locId) {
-    fetchWithUserAgent(`https://api.weather.gov/points/${lat},${lng}`)
-        .then(data => {
-            const city = data.properties.relativeLocation.properties.city;
-            const state = data.properties.relativeLocation.properties.state;
-            const station = data.properties.radarStation;
-            const hourlyUrl = data.properties.forecastHourly;
+function getEndpointsForBookmark(latitude, longitude, cityStationId, row1Id, row2Id) {
+  fetchWithUserAgent(`https://api.weather.gov/points/${latitude},${longitude}`)
+    .then(data => {
+      const { city, state } = data.properties.relativeLocation.properties;
+      const stationCode = data.properties.radarStation;
+      document.getElementById(cityStationId).textContent = `Nearest City: ${city}, ${state} | Station: ${stationCode}`;
+      return fetchWithUserAgent(data.properties.forecastHourly);
+    })
+    .then(data => {
+      const now = new Date();
+      const cutoff = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+      const periods = data.properties.periods.filter(period => {
+        const time = new Date(period.startTime);
+        return time >= now && time <= cutoff;
+      });
 
-            const infoBox = document.getElementById(`info-${locId}`);
-            if (infoBox) {
-                infoBox.textContent = `Nearest City: ${city}, ${state} | Station: ${station}`;
-            }
+      const row1 = document.getElementById(row1Id);
+      const row2 = document.getElementById(row2Id);
+      row1.innerHTML = "";
+      row2.innerHTML = "";
 
-            return fetchWithUserAgent(hourlyUrl);
-        })
-        .then(data => {
-            const periods = data.properties.periods;
-            const now = new Date();
-            const cutoff = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-            const next24Hours = periods.filter(p => {
-                const time = new Date(p.startTime);
-                return time >= now && time <= cutoff;
-            });
+      const firstHalf = periods.slice(0, 12);
+      const secondHalf = periods.slice(12, 24);
 
-            renderForecastCards(next24Hours, locId);
-        })
-        .catch(err => {
-            console.error("❌ Forecast load failed:", err);
+      [...firstHalf, ...secondHalf].forEach((p, idx) => {
+        const card = document.createElement("div");
+        card.className = "card text-center p-2 m-2";
+        card.style.width = "130px";
+
+        const iconClass = getWeatherIconClass(p.shortForecast);
+        const time = new Date(p.startTime).toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
         });
+
+        const fahrenheit = p.temperature;
+        const celsius = Math.round((fahrenheit - 32) * 5 / 9);
+
+        card.innerHTML = `
+          <h6>${time}</h6>
+          <i class="wi ${iconClass} wi-3x"></i>
+          <p>${p.shortForecast}<br>${fahrenheit}°F (${celsius}°C)</p>
+        `;
+
+        if (idx < 12) {
+          row1.appendChild(card);
+        } else {
+          row2.appendChild(card);
+        }
+      });
+    })
+    .catch(err => {
+      console.error("❌ Forecast load failed:", err);
+    });
 }
+
 
 function renderForecastCards(periods, locId) {
     const row1 = document.getElementById(`row-1-${locId}`);
