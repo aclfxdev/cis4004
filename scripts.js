@@ -355,20 +355,19 @@ function loadBookmarks() {
       const container = document.getElementById("saved-locations-list");
       container.innerHTML = '';
       locations.forEach(loc => {
-        const infoId = `info-bookmark-${loc.id}`;
-        const forecastId = `forecast-bookmark-${loc.id}`;
-
         const section = document.createElement("div");
         section.className = "col mb-4";
         section.innerHTML = `
-          <h5>${loc.location_name}</h5>
-          <p>(${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)})</p>
-          <div id="${infoId}" class="mb-2 text-muted"></div>
-          <div id="${forecastId}" class="row forecast-card-container"></div>
+          <div class="card p-3">
+            <h4>${loc.location_name}</h4>
+            <p class="text-muted" id="info-${loc.id}">Loading location info...</p>
+            <div id="row-1-${loc.id}" class="forecast-row"></div>
+            <div id="row-2-${loc.id}" class="forecast-row"></div>
+          </div>
         `;
         container.appendChild(section);
 
-        getEndpointsForBookmarks(loc.latitude, loc.longitude, infoId, forecastId);
+        getEndpointsForBookmark(loc.latitude, loc.longitude, loc.id);
       });
     })
     .catch(err => {
@@ -376,21 +375,28 @@ function loadBookmarks() {
     });
 }
 
-
-function getEndpointsForBookmarks(lat, lng, infoContainerId, forecastContainerId) {
-  fetchWithUserAgent(`https://api.weather.gov/points/${lat},${lng}`)
+function getEndpointsForBookmark(lat, lon, bookmarkId) {
+  fetchWithUserAgent(`https://api.weather.gov/points/${lat},${lon}`)
     .then(data => {
       const hourlyUrl = data.properties.forecastHourly;
       const { city, state } = data.properties.relativeLocation.properties;
       const station = data.properties.radarStation;
 
-      const infoContainer = document.getElementById(infoContainerId);
-      if (infoContainer) {
-        infoContainer.textContent = `Nearest City: ${city}, ${state} | Station: ${station}`;
+      // Update nearest city and station
+      const infoElem = document.getElementById(`info-${bookmarkId}`);
+      if (infoElem) {
+        infoElem.textContent = `Nearest City: ${city}, ${state} | Station: ${station}`;
       }
 
-      return fetchWithUserAgent(hourlyUrl);
+      return getForecastForBookmark(hourlyUrl, bookmarkId);
     })
+    .catch(err => {
+      console.error(`❌ Error fetching metadata for bookmark ${bookmarkId}:`, err);
+    });
+}
+
+function getForecastForBookmark(hourlyUrl, bookmarkId) {
+  fetchWithUserAgent(hourlyUrl)
     .then(data => {
       const now = new Date();
       const cutoff = new Date(now.getTime() + 24 * 60 * 60 * 1000);
@@ -399,37 +405,62 @@ function getEndpointsForBookmarks(lat, lng, infoContainerId, forecastContainerId
         return time >= now && time <= cutoff;
       });
 
-      const container = document.getElementById(forecastContainerId);
-      if (!container) return;
-
-      container.innerHTML = "";
-      periods.forEach(p => {
-        const card = document.createElement("div");
-        card.className = "card col-md-3 m-2 p-2 text-center";
-
-        const icon = getWeatherIconClass(p.shortForecast);
-        const time = new Date(p.startTime).toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: true
-        });
-
-        card.innerHTML = `
-          <h5>${time}</h5>
-          <i class="wi ${icon} wi-3x"></i>
-          <p>${p.shortForecast}<br>${p.temperature}°${p.temperatureUnit}</p>
-        `;
-        container.appendChild(card);
-      });
+      createWeatherCardsForBookmark(periods, bookmarkId);
     })
     .catch(err => {
-      console.error("❌ Error loading bookmark forecast:", err);
+      console.error(`❌ Error fetching forecast for bookmark ${bookmarkId}:`, err);
     });
 }
 
+function createWeatherCardsForBookmark(periods, bookmarkId) {
+  const row1 = document.getElementById(`row-1-${bookmarkId}`);
+  const row2 = document.getElementById(`row-2-${bookmarkId}`);
+  if (!row1 || !row2) return;
 
+  row1.innerHTML = '';
+  row2.innerHTML = '';
 
+  const firstHalf = periods.slice(0, 12);
+  const secondHalf = periods.slice(12, 24);
 
+  function createCard(element) {
+    const div = document.createElement("div");
+    div.className = "card forecast-card";
+
+    const h3 = document.createElement("h3");
+    const iconElem = document.createElement("i");
+    const p = document.createElement("p");
+
+    const iconClass = getWeatherIconClass(element.shortForecast);
+    iconElem.className = `wi ${iconClass}`;
+    iconElem.classList.add("wi-3x");
+
+    const localTime = new Date(element.startTime).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true
+    });
+    h3.textContent = localTime;
+
+    let tempText;
+    if (element.temperatureUnit === "F") {
+      const fahrenheit = element.temperature;
+      const celsius = Math.round((fahrenheit - 32) * 5 / 9);
+      tempText = `${fahrenheit}°F (${celsius}°C)`;
+    } else {
+      tempText = `${element.temperature}°${element.temperatureUnit}`;
+    }
+
+    p.innerHTML = `${element.shortForecast}<br>${tempText}`;
+    div.appendChild(h3);
+    div.appendChild(iconElem);
+    div.appendChild(p);
+    return div;
+  }
+
+  firstHalf.forEach(element => row1.appendChild(createCard(element)));
+  secondHalf.forEach(element => row2.appendChild(createCard(element)));
+}
 
 if (window.location.pathname.includes("bookmarks.html")) {
     checkAuthStatus(); // ensures currentUserId is set
