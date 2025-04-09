@@ -354,15 +354,22 @@ function loadBookmarks() {
     .then(locations => {
       const container = document.getElementById("saved-locations-list");
       container.innerHTML = '';
+
       locations.forEach(loc => {
         const section = document.createElement("div");
-        section.className = "col";
+        section.className = "col-12 mb-4 p-3 border rounded bg-dark text-white";
+
         section.innerHTML = `
-          <h5>${loc.location_name}</h5>
-          <p>(${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)})</p>
-          <button class="btn btn-sm btn-danger" onclick="deleteBookmark(${loc.id})">Delete</button>
-          <div id="forecast-${loc.id}" class="row forecast-card-container"></div>
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div>
+              <h5 class="mb-1">${loc.location_name}</h5>
+              <small>(${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)})</small>
+            </div>
+            <button class="btn btn-sm btn-danger" onclick="deleteBookmark(${loc.id})">Delete</button>
+          </div>
+          <div id="forecast-${loc.id}" class="row row-cols-2 row-cols-md-4 g-3"></div>
         `;
+
         container.appendChild(section);
         getEndpointsForBookmarks(loc.latitude, loc.longitude, `forecast-${loc.id}`);
       });
@@ -371,6 +378,7 @@ function loadBookmarks() {
       console.error("❌ Error loading bookmarks:", err);
     });
 }
+
 
 function deleteBookmark(id) {
   if (confirm("Are you sure you want to delete this bookmark?")) {
