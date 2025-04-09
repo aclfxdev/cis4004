@@ -356,21 +356,22 @@ function loadBookmarks() {
       container.innerHTML = '';
 
       locations.forEach(loc => {
-        const section = document.createElement("div");
-        section.className = "col-12 mb-4 p-3 border rounded bg-dark text-white";
+        const card = document.createElement("div");
+        card.className = "col-12 mb-4 p-3 border rounded bg-dark text-white";
 
-        section.innerHTML = `
-          <div class="d-flex justify-content-between align-items-center mb-2">
+        card.innerHTML = `
+          <div class="d-flex justify-content-between align-items-center">
             <div>
-              <h5 class="mb-1">${loc.location_name}</h5>
-              <small>(${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)})</small>
+              <strong>${loc.location_name}</strong> (${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)})
             </div>
             <button class="btn btn-sm btn-danger" onclick="deleteBookmark(${loc.id})">Delete</button>
           </div>
-          <div id="forecast-${loc.id}" class="row row-cols-2 row-cols-md-4 g-3"></div>
+          <div id="forecast-${loc.id}" class="row mt-3"></div>
         `;
 
-        container.appendChild(section);
+        container.appendChild(card);
+
+        // Show the 24-hour forecast for this bookmark
         getEndpointsForBookmarks(loc.latitude, loc.longitude, `forecast-${loc.id}`);
       });
     })
@@ -385,16 +386,16 @@ function deleteBookmark(id) {
     fetch(`/api/locations/${id}`, {
       method: "DELETE"
     })
-      .then(res => res.json())
-      .then(data => {
-        console.log("✅ Bookmark deleted:", data);
-        loadBookmarks();
-      })
-      .catch(err => {
-        console.error("❌ Failed to delete bookmark:", err);
-      });
+    .then(res => res.json())
+    .then(() => {
+      loadBookmarks(); // Refresh the list
+    })
+    .catch(err => {
+      console.error("❌ Failed to delete bookmark:", err);
+    });
   }
 }
+
 
 function getEndpointsForBookmark(lat, lon, cityStationId, row1Id, row2Id) {
   fetchWithUserAgent(`https://api.weather.gov/points/${lat},${lon}`)
