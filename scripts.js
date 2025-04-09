@@ -347,120 +347,105 @@ function checkAuthStatus() {
 }
 
 function loadBookmarks() {
-  if (!currentUserId) return;
+    if (!currentUserId) return;
 
-  fetch(`/api/locations/${currentUserId}`)
-    .then(res => res.json())
-    .then(locations => {
-      const container = document.getElementById("saved-locations-list");
-      container.innerHTML = '';
-      locations.forEach(loc => {
-        const section = document.createElement("div");
-        section.className = "col mb-4";
-        section.innerHTML = `
-          <div class="card p-3">
-            <h4>${loc.location_name}</h4>
-            <p class="text-muted" id="info-${loc.id}">Loading location info...</p>
-            <div id="row-1-${loc.id}" class="forecast-row"></div>
-            <div id="row-2-${loc.id}" class="forecast-row"></div>
-          </div>
+    fetch(`/api/locations/${currentUserId}`)
+        .then(res => res.json())
+        .then(locations => {
+            const container = document.getElementById("saved-locations-list");
+            container.innerHTML = '';
+
+            locations.forEach(loc => {
+                const wrapper = document.createElement("div");
+                wrapper.className = "col";
+
+                wrapper.innerHTML = `
+                    <div class="card p-3 shadow-sm">
+                        <h4>${loc.location_name}</h4>
+                        <p><em>(${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)})</em></p>
+                        <div id="info-${loc.id}" class="mb-2 text-muted small"></div>
+                        <div id="card-container-${loc.id}">
+                            <div id="row-1-${loc.id}" class="forecast-row d-flex flex-wrap justify-content-start"></div>
+                            <div id="row-2-${loc.id}" class="forecast-row d-flex flex-wrap justify-content-start"></div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(wrapper);
+
+                getEndpointsForBookmark(loc.latitude, loc.longitude, loc.id);
+            });
+        })
+        .catch(err => {
+            console.error("❌ Error loading bookmarks:", err);
+        });
+}
+
+function getEndpointsForBookmark(lat, lng, locId) {
+    fetchWithUserAgent(`https://api.weather.gov/points/${lat},${lng}`)
+        .then(data => {
+            const city = data.properties.relativeLocation.properties.city;
+            const state = data.properties.relativeLocation.properties.state;
+            const station = data.properties.radarStation;
+            const hourlyUrl = data.properties.forecastHourly;
+
+            const infoBox = document.getElementById(`info-${locId}`);
+            if (infoBox) {
+                infoBox.textContent = `Nearest City: ${city}, ${state} | Station: ${station}`;
+            }
+
+            return fetchWithUserAgent(hourlyUrl);
+        })
+        .then(data => {
+            const periods = data.properties.periods;
+            const now = new Date();
+            const cutoff = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+            const next24Hours = periods.filter(p => {
+                const time = new Date(p.startTime);
+                return time >= now && time <= cutoff;
+            });
+
+            renderForecastCards(next24Hours, locId);
+        })
+        .catch(err => {
+            console.error("❌ Forecast load failed:", err);
+        });
+}
+
+function renderForecastCards(periods, locId) {
+    const row1 = document.getElementById(`row-1-${locId}`);
+    const row2 = document.getElementById(`row-2-${locId}`);
+
+    if (!row1 || !row2) return;
+
+    row1.innerHTML = '';
+    row2.innerHTML = '';
+
+    const firstHalf = periods.slice(0, 12);
+    const secondHalf = periods.slice(12, 24);
+
+    function createCard(p) {
+        const card = document.createElement("div");
+        card.className = "card m-2 p-2 text-center";
+        const icon = getWeatherIconClass(p.shortForecast);
+        const localTime = new Date(p.startTime).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+        const tempText = `${p.temperature}°${p.temperatureUnit}`;
+
+        card.innerHTML = `
+            <h5>${localTime}</h5>
+            <i class="wi ${icon} wi-3x"></i>
+            <p>${p.shortForecast}<br>${tempText}</p>
         `;
-        container.appendChild(section);
-
-        getEndpointsForBookmark(loc.latitude, loc.longitude, loc.id);
-      });
-    })
-    .catch(err => {
-      console.error("❌ Error loading bookmarks:", err);
-    });
-}
-
-function getEndpointsForBookmark(lat, lon, bookmarkId) {
-  fetchWithUserAgent(`https://api.weather.gov/points/${lat},${lon}`)
-    .then(data => {
-      const hourlyUrl = data.properties.forecastHourly;
-      const { city, state } = data.properties.relativeLocation.properties;
-      const station = data.properties.radarStation;
-
-      // Update nearest city and station
-      const infoElem = document.getElementById(`info-${bookmarkId}`);
-      if (infoElem) {
-        infoElem.textContent = `Nearest City: ${city}, ${state} | Station: ${station}`;
-      }
-
-      return getForecastForBookmark(hourlyUrl, bookmarkId);
-    })
-    .catch(err => {
-      console.error(`❌ Error fetching metadata for bookmark ${bookmarkId}:`, err);
-    });
-}
-
-function getForecastForBookmark(hourlyUrl, bookmarkId) {
-  fetchWithUserAgent(hourlyUrl)
-    .then(data => {
-      const now = new Date();
-      const cutoff = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-      const periods = data.properties.periods.filter(period => {
-        const time = new Date(period.startTime);
-        return time >= now && time <= cutoff;
-      });
-
-      createWeatherCardsForBookmark(periods, bookmarkId);
-    })
-    .catch(err => {
-      console.error(`❌ Error fetching forecast for bookmark ${bookmarkId}:`, err);
-    });
-}
-
-function createWeatherCardsForBookmark(periods, bookmarkId) {
-  const row1 = document.getElementById(`row-1-${bookmarkId}`);
-  const row2 = document.getElementById(`row-2-${bookmarkId}`);
-  if (!row1 || !row2) return;
-
-  row1.innerHTML = '';
-  row2.innerHTML = '';
-
-  const firstHalf = periods.slice(0, 12);
-  const secondHalf = periods.slice(12, 24);
-
-  function createCard(element) {
-    const div = document.createElement("div");
-    div.className = "card forecast-card";
-
-    const h3 = document.createElement("h3");
-    const iconElem = document.createElement("i");
-    const p = document.createElement("p");
-
-    const iconClass = getWeatherIconClass(element.shortForecast);
-    iconElem.className = `wi ${iconClass}`;
-    iconElem.classList.add("wi-3x");
-
-    const localTime = new Date(element.startTime).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true
-    });
-    h3.textContent = localTime;
-
-    let tempText;
-    if (element.temperatureUnit === "F") {
-      const fahrenheit = element.temperature;
-      const celsius = Math.round((fahrenheit - 32) * 5 / 9);
-      tempText = `${fahrenheit}°F (${celsius}°C)`;
-    } else {
-      tempText = `${element.temperature}°${element.temperatureUnit}`;
+        return card;
     }
 
-    p.innerHTML = `${element.shortForecast}<br>${tempText}`;
-    div.appendChild(h3);
-    div.appendChild(iconElem);
-    div.appendChild(p);
-    return div;
-  }
-
-  firstHalf.forEach(element => row1.appendChild(createCard(element)));
-  secondHalf.forEach(element => row2.appendChild(createCard(element)));
+    firstHalf.forEach(p => row1.appendChild(createCard(p)));
+    secondHalf.forEach(p => row2.appendChild(createCard(p)));
 }
+
 
 if (window.location.pathname.includes("bookmarks.html")) {
     checkAuthStatus(); // ensures currentUserId is set
