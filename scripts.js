@@ -451,7 +451,3 @@ if (window.location.pathname.includes("bookmarks.html")) {
     checkAuthStatus(); // ensures currentUserId is set
     loadBookmarks();   // loads and renders forecasts
 }
-
-
-
-
