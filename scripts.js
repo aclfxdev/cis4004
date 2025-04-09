@@ -354,29 +354,38 @@ function loadBookmarks() {
     .then(locations => {
       const container = document.getElementById("saved-locations-list");
       container.innerHTML = '';
-
       locations.forEach(loc => {
         const section = document.createElement("div");
-        section.className = "col-12 mb-5";
-
-        const cityStationId = `city-${loc.id}`;
-        const row1Id = `row1-${loc.id}`;
-        const row2Id = `row2-${loc.id}`;
-
+        section.className = "col";
         section.innerHTML = `
-          <h4>${loc.location_name} (${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)})</h4>
-          <p id="${cityStationId}" class="text-muted mb-2">Loading city/station...</p>
-          <div class="forecast-container">
-            <div id="${row1Id}" class="forecast-row d-flex flex-wrap gap-3"></div>
-            <div id="${row2Id}" class="forecast-row d-flex flex-wrap gap-3 mt-3"></div>
-          </div>
+          <h5>${loc.location_name}</h5>
+          <p>(${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)})</p>
+          <button class="btn btn-sm btn-danger" onclick="deleteBookmark(${loc.id})">Delete</button>
+          <div id="forecast-${loc.id}" class="row forecast-card-container"></div>
         `;
         container.appendChild(section);
-
-        getEndpointsForBookmark(loc.latitude, loc.longitude, cityStationId, row1Id, row2Id);
+        getEndpointsForBookmarks(loc.latitude, loc.longitude, `forecast-${loc.id}`);
       });
     })
-    .catch(err => console.error("Bookmark loading failed:", err));
+    .catch(err => {
+      console.error("❌ Error loading bookmarks:", err);
+    });
+}
+
+function deleteBookmark(id) {
+  if (confirm("Are you sure you want to delete this bookmark?")) {
+    fetch(`/api/locations/${id}`, {
+      method: "DELETE"
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log("✅ Bookmark deleted:", data);
+        loadBookmarks();
+      })
+      .catch(err => {
+        console.error("❌ Failed to delete bookmark:", err);
+      });
+  }
 }
 
 function getEndpointsForBookmark(lat, lon, cityStationId, row1Id, row2Id) {
