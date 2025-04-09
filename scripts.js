@@ -357,121 +357,80 @@ function loadBookmarks() {
 
       locations.forEach(loc => {
         const section = document.createElement("div");
-        section.className = "col";
+        section.className = "col-12 mb-5";
 
-        // Unique IDs
-        const cityStationId = `location-info-${loc.id}`;
+        const cityStationId = `city-${loc.id}`;
         const row1Id = `row1-${loc.id}`;
         const row2Id = `row2-${loc.id}`;
 
         section.innerHTML = `
-          <h5>${loc.location_name} (${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)})</h5>
-          <p id="${cityStationId}" class="text-muted mb-2">Loading location details...</p>
-          <div id="${row1Id}" class="forecast-row d-flex flex-wrap"></div>
-          <div id="${row2Id}" class="forecast-row d-flex flex-wrap mt-2"></div>
+          <h4>${loc.location_name} (${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)})</h4>
+          <p id="${cityStationId}" class="text-muted mb-2">Loading city/station...</p>
+          <div class="forecast-container">
+            <div id="${row1Id}" class="forecast-row d-flex flex-wrap gap-3"></div>
+            <div id="${row2Id}" class="forecast-row d-flex flex-wrap gap-3 mt-3"></div>
+          </div>
         `;
-
         container.appendChild(section);
+
         getEndpointsForBookmark(loc.latitude, loc.longitude, cityStationId, row1Id, row2Id);
       });
     })
-    .catch(err => {
-      console.error("❌ Error loading bookmarks:", err);
-    });
+    .catch(err => console.error("Bookmark loading failed:", err));
 }
 
-function getEndpointsForBookmark(latitude, longitude, cityStationId, row1Id, row2Id) {
-  fetchWithUserAgent(`https://api.weather.gov/points/${latitude},${longitude}`)
+function getEndpointsForBookmark(lat, lon, cityStationId, row1Id, row2Id) {
+  fetchWithUserAgent(`https://api.weather.gov/points/${lat},${lon}`)
     .then(data => {
       const { city, state } = data.properties.relativeLocation.properties;
-      const stationCode = data.properties.radarStation;
-      document.getElementById(cityStationId).textContent = `Nearest City: ${city}, ${state} | Station: ${stationCode}`;
+      const station = data.properties.radarStation;
+      document.getElementById(cityStationId).textContent = `Nearest City: ${city}, ${state} | Station: ${station}`;
       return fetchWithUserAgent(data.properties.forecastHourly);
     })
     .then(data => {
       const now = new Date();
       const cutoff = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-      const periods = data.properties.periods.filter(period => {
-        const time = new Date(period.startTime);
-        return time >= now && time <= cutoff;
+      const periods = data.properties.periods.filter(p => {
+        const start = new Date(p.startTime);
+        return start >= now && start <= cutoff;
       });
 
       const row1 = document.getElementById(row1Id);
       const row2 = document.getElementById(row2Id);
-      row1.innerHTML = "";
-      row2.innerHTML = "";
 
-      const firstHalf = periods.slice(0, 12);
-      const secondHalf = periods.slice(12, 24);
+      if (!row1 || !row2) {
+        console.warn("Missing row containers:", row1Id, row2Id);
+        return;
+      }
 
-      [...firstHalf, ...secondHalf].forEach((p, idx) => {
+      row1.innerHTML = '';
+      row2.innerHTML = '';
+
+      periods.forEach((p, i) => {
         const card = document.createElement("div");
-        card.className = "card text-center p-2 m-2";
-        card.style.width = "130px";
+        card.className = "card p-2 text-center";
+        card.style.width = "120px";
 
-        const iconClass = getWeatherIconClass(p.shortForecast);
+        const icon = getWeatherIconClass(p.shortForecast);
         const time = new Date(p.startTime).toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: true
+          hour: "2-digit", minute: "2-digit", hour12: true
         });
-
         const fahrenheit = p.temperature;
         const celsius = Math.round((fahrenheit - 32) * 5 / 9);
 
         card.innerHTML = `
           <h6>${time}</h6>
-          <i class="wi ${iconClass} wi-3x"></i>
+          <i class="wi ${icon} wi-3x"></i>
           <p>${p.shortForecast}<br>${fahrenheit}°F (${celsius}°C)</p>
         `;
 
-        if (idx < 12) {
-          row1.appendChild(card);
-        } else {
-          row2.appendChild(card);
-        }
+        if (i < 12) row1.appendChild(card);
+        else row2.appendChild(card);
       });
     })
-    .catch(err => {
-      console.error("❌ Forecast load failed:", err);
-    });
+    .catch(err => console.error("Forecast loading failed:", err));
 }
 
-
-function renderForecastCards(periods, locId) {
-    const row1 = document.getElementById(`row-1-${locId}`);
-    const row2 = document.getElementById(`row-2-${locId}`);
-
-    if (!row1 || !row2) return;
-
-    row1.innerHTML = '';
-    row2.innerHTML = '';
-
-    const firstHalf = periods.slice(0, 12);
-    const secondHalf = periods.slice(12, 24);
-
-    function createCard(p) {
-        const card = document.createElement("div");
-        card.className = "card m-2 p-2 text-center";
-        const icon = getWeatherIconClass(p.shortForecast);
-        const localTime = new Date(p.startTime).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
-        });
-        const tempText = `${p.temperature}°${p.temperatureUnit}`;
-
-        card.innerHTML = `
-            <h5>${localTime}</h5>
-            <i class="wi ${icon} wi-3x"></i>
-            <p>${p.shortForecast}<br>${tempText}</p>
-        `;
-        return card;
-    }
-
-    firstHalf.forEach(p => row1.appendChild(createCard(p)));
-    secondHalf.forEach(p => row2.appendChild(createCard(p)));
-}
 
 
 if (window.location.pathname.includes("bookmarks.html")) {
