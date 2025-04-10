@@ -10,9 +10,6 @@
         <!-- Link existing stylesheet -->
         <link rel="stylesheet" href="style/style.css">
         
-        <!-- Link maps-specific stylesheet -->
-        <link rel="stylesheet" href="style/maps-style.css">
-        
         <!-- Link Roboto font -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -72,8 +69,50 @@
         </nav>
         
         <div class="container-fluid">
-            <br><br>
-            <h1>Atlantic Hurricanes</h1>
+			<br><br>
+			<div class="container my-4">
+				<h1><b>Major Florida Hurricanes (Cat. &gt;= 3)</b></h1>
+				<h6><em>Sorted by most recent first.</em></h6>
+				<br><br><br>
+				<div class="accordion" id="hurricaneAccordion">
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="heading1">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
+								<b>Hurricane Milton</b>&nbsp;&nbsp;|&nbsp;&nbsp;(Oct. 9th, 2024)
+							</button>
+						</h2>
+						<div id="collapse1" class="accordion-collapse collapse" aria-labelledby="heading1" data-bs-parent="#hurricaneAccordion">
+							<div class="accordion-body">
+								<p><strong>Intensity:</strong> Category 3</p>
+								<p><strong>Peak Wind Measurement:</strong> 180 mph</p>
+								<p><strong>Landfall Wind Measurement:</strong> 105 knots</p>
+								<p><strong>Lowest Pressure:</strong> 895 mbar</p>
+								<p><strong>Landfall:</strong> Siesta Key</p>
+								<p><strong>Description:</strong> Hurricane Milton was an extremely powerful and destructive tropical cyclone which became the most intense Atlantic hurricane ever recorded over the Gulf of Mexico, tying with Hurricane Rita in 2005. Milton made landfall on the west coast of the U.S. state of Florida, less than two weeks after Hurricane Helene devastated the state's Big Bend region. <br><br>The thirteenth named storm, ninth hurricane, fourth major hurricane, and second Category 5 hurricane of the 2024 Atlantic hurricane season, Milton was the strongest tropical cyclone to occur worldwide in 2024.</p>
+								<p><strong><a class="hurricaneLink" href="https://en.wikipedia.org/wiki/Hurricane_Milton" target="_blank">Wikipedia Article</a></strong></p>
+							</div>
+						</div>
+					</div>
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="heading2">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+								<b>Hurricane Helene</b>&nbsp;&nbsp;|&nbsp;&nbsp;(Sept. 27th, 2024)
+							</button>
+						</h2>
+						<div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2" data-bs-parent="#hurricaneAccordion">
+							<div class="accordion-body">
+								<p><strong>Intensity:</strong> Category 4</p>
+								<p><strong>Peak Wind Measurement:</strong> 140 mph</p>
+								<p><strong>Landfall Wind Measurement:</strong> 120 knots</p>
+								<p><strong>Lowest Pressure:</strong> 939 mbar</p>
+								<p><strong>Landfall:</strong> Perry</p>
+								<p><strong>Description:</strong> Hurricane Helene was a deadly and devastating tropical cyclone that caused widespread catastrophic damage and numerous fatalities across the Southeastern United States in late September 2024. It was the strongest hurricane on record to strike the Big Bend region of Florida, the deadliest Atlantic hurricane since Maria in 2017, and the deadliest to strike the mainland U.S. since Katrina in 2005. <br><br>Helen was the eighth named storm, fifth hurricane, and second major hurricane of the 2024 Atlantic hurricane season.</p>
+								<p><strong><a class="hurricaneLink" href="https://en.wikipedia.org/wiki/Hurricane_Helene" target="_blank">Wikipedia Article</a></strong></p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
         </div>
 
         <!-- Include JavaScript for authentication and other scripts -->

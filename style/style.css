@@ -171,6 +171,27 @@ body {
 	margin-bottom: 2rem;
 }
 
+.accordion-button {
+	background-color: #eee !important; /* Replace with your desired light mode background */
+	color: #000 !important; /* Your desired text color */
+	border: 1px solid #ddd; /* Optional: adjust border as needed */
+}
+
+.accordion-button:not(.collapsed) {
+	background-color: #46e0bf !important; /* Background when the accordion is expanded */
+	color: #333333 !important;
+}
+
+.accordion-button:focus {
+	outline: none !important;
+	box-shadow: none !important;
+}
+
+.hurricaneLink {
+	color: black;
+	text-decoration: overline;
+}
+
 /* Dark mode styles for desktop */
 body.dark-mode {
     background-color: #121212;
@@ -202,6 +223,33 @@ body.dark-mode .navbar .navbar-brand {
     color: #e0e0e0 !important;
 }
 
+/* Accordion in dark mode */
+body.dark-mode .accordion-item {
+	background-color: #1e1e1e;  /* Similar to your .card dark color */
+	border-color: #333;
+}
+
+body.dark-mode .accordion-button {
+	background-color: #1e1e1e;
+	color: #e0e0e0;
+}
+
+/* When accordion is expanded (button not collapsed), adjust color */
+body.dark-mode .accordion-button:not(.collapsed) {
+	background-color: #333;
+	color: #e0e0e0;
+}
+
+/* Accordion body in dark mode */
+body.dark-mode .accordion-body {
+	background-color: #1e1e1e;
+	color: #e0e0e0;
+}
+
+body.dark-mode .hurricaneLink {
+	color: white;
+	text-decoration: overline;
+}
 
 /* Dark mode toggle switch styles */
 .theme-switch {
