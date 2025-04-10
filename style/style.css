@@ -192,6 +192,11 @@ body {
 	text-decoration: overline;
 }
 
+.active {
+	text-decoration: overline;
+	transition: 1s;
+}
+
 /* Dark mode styles for desktop */
 body.dark-mode {
     background-color: #121212;
@@ -249,6 +254,10 @@ body.dark-mode .accordion-body {
 body.dark-mode .hurricaneLink {
 	color: white;
 	text-decoration: overline;
+}
+
+body.dark-mode .active {
+	color: #46e0bf !important;
 }
 
 /* Dark mode toggle switch styles */
