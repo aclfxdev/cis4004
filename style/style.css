@@ -194,7 +194,7 @@ body {
 
 .navbar .nav-link.active {
 	text-decoration: overline;
-	transition: 1s;
+	transition: 0.5s;
 }
 
 /* Dark mode styles for desktop */
@@ -258,6 +258,7 @@ body.dark-mode .hurricaneLink {
 
 body.dark-mode .navbar .nav-link.active {
 	color: #46e0bf !important;
+	transition: 0.5s;
 }
 
 /* Dark mode toggle switch styles */
