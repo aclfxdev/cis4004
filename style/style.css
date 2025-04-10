@@ -192,7 +192,7 @@ body {
 	text-decoration: overline;
 }
 
-.active {
+.navbar .nav-link.active {
 	text-decoration: overline;
 	transition: 1s;
 }
@@ -256,7 +256,7 @@ body.dark-mode .hurricaneLink {
 	text-decoration: overline;
 }
 
-body.dark-mode .active {
+body.dark-mode .navbar .nav-link.active {
 	color: #46e0bf !important;
 }
 
