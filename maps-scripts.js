@@ -288,7 +288,7 @@ window.addEventListener('load', function () {
 document.getElementById("bookmark-btn")?.addEventListener("click", () => {
     if (!selectedLat || !selectedLng || !currentUserId) return;
 
-    const locationName = prompt("Enter a name for this location:");
+    const locationName = prompt("Enter a name for this location:", "$(data.properties.radarStation)");
     if (!locationName) return;
 
     fetch("/api/locations", {
