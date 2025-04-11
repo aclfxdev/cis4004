@@ -361,10 +361,8 @@ function loadBookmarks() {
 		  
 		card.innerHTML = `
           <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <strong>${loc.location_name}</strong> (${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)})
-            </div>
-            <button class="btn btn-sm btn-danger">Delete</button>
+          	<strong>${loc.location_name}</strong> (${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)})
+            <button class="btn">Delete</button>
           </div>
           <div id="forecast-${loc.id}" class="row mt-3"></div>
         `;
