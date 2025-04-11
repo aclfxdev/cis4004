@@ -507,4 +507,5 @@ function updateBookmarkTextVisibility() {
 
 if (window.location.pathname.includes("bookmarks.html")) {
     checkAuthStatus(); // ensures currentUserId is set
+	updateBookmarkTextVisibility();
 }
