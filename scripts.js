@@ -27,7 +27,7 @@ function getWeatherIconClass(condition) {
     return "wi-na";
 }
 
-// Define the function to fetch with User-Agent
+// Define func to fetch with User-Agent
 function fetchWithUserAgent(url) {
     const headers = {
         "User-Agent": "CIS-4004 Weather Forecasting (ch797590@ucf.edu / ja939451@ucf.edu)",
@@ -68,7 +68,7 @@ function getCookie(cname) {
     return "";
 }
 
-// ================= Dark Mode Functions (Cookie-Based) =================
+// Dark mode funcs (cookie-based)
 function applyTheme(theme) {
     if (theme === "dark") {
         document.body.classList.add("dark-mode");
@@ -104,7 +104,7 @@ function initTheme() {
 
 document.addEventListener("DOMContentLoaded", initTheme);
 
-// ================= Geolocation =================
+// Geoloc
 if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -292,28 +292,8 @@ function showSavedLocationsSection() {
     document.getElementById("saved-locations-container").style.display = "block";
 }
 
-/*
-function loadSavedLocations() {
-    fetch(`/api/locations/${currentUserId}`)
-        .then(res => res.json())
-        .then(locations => {
-            const list = document.getElementById("saved-locations-list");
-            list.innerHTML = '';
-            locations.forEach(loc => {
-                const item = document.createElement("li");
-                item.className = "list-group-item";
-                item.innerHTML = `
-				<strong>${loc.location_name}</strong> (${loc.latitude}, ${loc.longitude})
-				<button class="btn btn-sm btn-danger" onclick="deleteBookmark(${loc.id})">Delete</button>
-				`;
-                item.addEventListener("click", () => getEndpoints(loc.latitude, loc.longitude));
-                list.appendChild(item);
-            });
-        });
-}
-*/
 
-// NEW: Rewrite the loadSavedLocations function to create an accordion for bookmarks.
+// loadSavedLocations function to create an accordion for bookmarks.
 function loadSavedLocations() {
 	fetch(`/api/locations/${currentUserId}`)
 		.then(res => res.json())
@@ -341,7 +321,7 @@ function loadSavedLocations() {
 				accordionItem.innerHTML = `
 					<h2 class="accordion-header" id="${headingId}">
 						<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false" aria-controls="${collapseId}">
-							<strong>${loc.location_name}</strong>
+							<strong>${loc.location_name}</strong><button class="btn btn-sm btn-danger mt-2 float-end" onclick="deleteBookmark(${loc.id})">Delete</button>
 						</button>
 					</h2>
 					<div id="${collapseId}" class="accordion-collapse collapse" aria-labelledby="${headingId}" data-bs-parent="#bookmarksAccordion">
@@ -351,7 +331,6 @@ function loadSavedLocations() {
 								<div id="${row1Id}" class="forecast-row"></div>
 								<div id="${row2Id}" class="forecast-row"></div>
 							</div>
-							<button class="btn btn-sm btn-danger mt-2" onclick="deleteBookmark(${loc.id})">Delete</button>
 						</div>
 					</div>
 				`;
@@ -420,7 +399,7 @@ function checkAuthStatus() {
         });
 }
 
-// NEW: Fetch forecast data for a bookmark and render cards into the given container IDs.
+// Fetch forecast data for a bookmark and render cards into the given container IDs.
 async function getForecastForBookmark(bookmarkLat, bookmarkLng, row1Id, row2Id) {
 	try {
 		// Get forecastHourly URL via weather.gov API
@@ -444,7 +423,7 @@ async function getForecastForBookmark(bookmarkLat, bookmarkLng, row1Id, row2Id) 
 	}
 }
 
-// NEW: Create forecast cards into the provided container IDs (for row1 and row2).
+// Create bookmark forecast cards into the provided container IDs (for row1 and row2).
 function createForecastCardsForBookmark(periods, row1Id, row2Id) {
 	const row1Container = document.getElementById(row1Id);
 	const row2Container = document.getElementById(row2Id);
