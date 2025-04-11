@@ -293,7 +293,6 @@ function showSavedLocationsSection() {
 }
 
 
-/*
 function loadSavedLocations() {
     fetch(`/api/locations/${currentUserId}`)
         .then(res => res.json())
@@ -309,7 +308,7 @@ function loadSavedLocations() {
             });
         });
 }
-*/
+
 
 document.getElementById("save-location-form")?.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -349,6 +348,7 @@ function checkAuthStatus() {
         });
 }
 
+/*
 function loadBookmarks() {
   if (!currentUserId) return;
 
@@ -382,7 +382,9 @@ function loadBookmarks() {
       console.error("❌ Error loading bookmarks:", err);
     });
 }
+*/
 
+/*
 
 function deleteBookmark(id) {
   if (confirm("Are you sure you want to delete this bookmark?")) {
@@ -398,8 +400,9 @@ function deleteBookmark(id) {
     });
   }
 }
+*/
 
-
+/*
 function getEndpointsForBookmark(lat, lon, cityStationId, row1Id, row2Id) {
   fetchWithUserAgent(`https://api.weather.gov/points/${lat},${lon}`)
     .then(data => {
@@ -451,7 +454,7 @@ function getEndpointsForBookmark(lat, lon, cityStationId, row1Id, row2Id) {
     })
     .catch(err => console.error("Forecast loading failed:", err));
 }
-
+*/
 
 
 if (window.location.pathname.includes("bookmarks.html")) {
