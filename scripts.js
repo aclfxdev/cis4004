@@ -321,7 +321,7 @@ function loadSavedLocations() {
 				accordionItem.innerHTML = `
 					<h2 class="accordion-header" id="${headingId}">
 						<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false" aria-controls="${collapseId}">
-							<strong>${loc.location_name}</strong><button class="btn btn-sm btn-danger mt-2 float-end" onclick="deleteBookmark(${loc.id})">Delete</button>
+							<strong>${loc.location_name}</strong><button class="btn btn-sm btn-danger mt-2" onclick="deleteBookmark(${loc.id})">Delete</button>
 						</button>
 					</h2>
 					<div id="${collapseId}" class="accordion-collapse collapse" aria-labelledby="${headingId}" data-bs-parent="#bookmarksAccordion">
