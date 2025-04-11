@@ -292,6 +292,7 @@ function showSavedLocationsSection() {
     document.getElementById("saved-locations-container").style.display = "block";
 }
 
+/*
 function loadSavedLocations() {
     fetch(`/api/locations/${currentUserId}`)
         .then(res => res.json())
@@ -310,43 +311,60 @@ function loadSavedLocations() {
             });
         });
 }
+*/
 
-/* Use later for styling maybe
+// NEW: Rewrite the loadSavedLocations function to create an accordion for bookmarks.
 function loadSavedLocations() {
-    fetch(`/api/locations/${currentUserId}`)
-        .then(res => res.json())
-        .then(locations => {
-            const list = document.getElementById("saved-locations-list");
-            list.innerHTML = '';
-            locations.forEach(index, loc => {
-                const item = document.createElement("li");
-                item.className = "list-group-item";
-                item.innerHTML = `
-				<strong>${loc.location_name}</strong> (${loc.latitude}, ${loc.longitude})
-				<div class="accordion" id="hurricaneAccordion">
-					<div class="accordion-item">
-						<h2 class="accordion-header" id="heading${index}">
-							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${index}" aria-expanded="false" aria-controls="collapse${index}">
-								<b>Test</b>
-							</button>
-						</h2>
-						<div id="collapse${index}" class="accordion-collapse collapse" aria-labelledby="heading${index}" data-bs-parent="#hurricaneAccordion">
-							<div class="accordion-body">
-								<div id="card-container">
-							<div id="row-1" class="forecast-row"></div>
-							<div id="row-2" class="forecast-row"></div>
-						</div>
+	fetch(`/api/locations/${currentUserId}`)
+		.then(res => res.json())
+		.then(locations => {
+			const container = document.getElementById("saved-locations-list");
+			container.innerHTML = "";
+			
+			// Create an accordion container for the bookmarks
+			const accordionContainer = document.createElement("div");
+			accordionContainer.className = "accordion";
+			accordionContainer.id = "bookmarksAccordion";
+			container.appendChild(accordionContainer);
+			
+			locations.forEach(loc => {
+				// Use the bookmark id for unique element IDs
+				const itemId = loc.id;
+				const headingId = `bookmarkHeading-${itemId}`;
+				const collapseId = `bookmarkCollapse-${itemId}`;
+				const row1Id = `bookmarkRow1-${itemId}`;
+				const row2Id = `bookmarkRow2-${itemId}`;
+				
+				// Create the accordion item markup
+				const accordionItem = document.createElement("div");
+				accordionItem.className = "accordion-item";
+				accordionItem.innerHTML = `
+					<h2 class="accordion-header" id="${headingId}">
+						<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false" aria-controls="${collapseId}">
+							<strong>${loc.location_name}</strong>
+						</button>
+					</h2>
+					<div id="${collapseId}" class="accordion-collapse collapse" aria-labelledby="${headingId}" data-bs-parent="#bookmarksAccordion">
+						<div class="accordion-body">
+							<div class="forecast-container">
+								(${loc.latitude}, ${loc.longitude})
+								<div id="${row1Id}" class="forecast-row"></div>
+								<div id="${row2Id}" class="forecast-row"></div>
 							</div>
+							<button class="btn btn-sm btn-danger mt-2" onclick="deleteBookmark(${loc.id})">Delete</button>
 						</div>
 					</div>
-				</div>
 				`;
-                item.addEventListener("click", () => getEndpoints(loc.latitude, loc.longitude));
-                list.appendChild(item);
-            });
-        });
+				accordionContainer.appendChild(accordionItem);
+				
+				// When an accordion item is expanded, load its forecast info
+				const collapseElem = accordionItem.querySelector(`#${collapseId}`);
+				collapseElem.addEventListener("shown.bs.collapse", () => {
+					getForecastForBookmark(loc.latitude, loc.longitude, row1Id, row2Id);
+				});
+			});
+		});
 }
-*/
 
 function deleteBookmark(id) {
   if (confirm("Are you sure you want to delete this bookmark?")) {
@@ -476,59 +494,6 @@ function createForecastCardsForBookmark(periods, row1Id, row2Id) {
 	firstHalf.forEach(element => row1Container.appendChild(createCard(element)));
 	secondHalf.forEach(element => row2Container.appendChild(createCard(element)));
 }
-
-// NEW: Rewrite the loadSavedLocations function to create an accordion for bookmarks.
-function loadSavedLocations() {
-	fetch(`/api/locations/${currentUserId}`)
-		.then(res => res.json())
-		.then(locations => {
-			const container = document.getElementById("saved-locations-list");
-			container.innerHTML = "";
-			
-			// Create an accordion container for the bookmarks
-			const accordionContainer = document.createElement("div");
-			accordionContainer.className = "accordion";
-			accordionContainer.id = "bookmarksAccordion";
-			container.appendChild(accordionContainer);
-			
-			locations.forEach(loc => {
-				// Use the bookmark id for unique element IDs
-				const itemId = loc.id;
-				const headingId = `bookmarkHeading-${itemId}`;
-				const collapseId = `bookmarkCollapse-${itemId}`;
-				const row1Id = `bookmarkRow1-${itemId}`;
-				const row2Id = `bookmarkRow2-${itemId}`;
-				
-				// Create the accordion item markup
-				const accordionItem = document.createElement("div");
-				accordionItem.className = "accordion-item";
-				accordionItem.innerHTML = `
-					<h2 class="accordion-header" id="${headingId}">
-						<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false" aria-controls="${collapseId}">
-							<strong>${loc.location_name}</strong> (${loc.latitude}, ${loc.longitude})
-						</button>
-					</h2>
-					<div id="${collapseId}" class="accordion-collapse collapse" aria-labelledby="${headingId}" data-bs-parent="#bookmarksAccordion">
-						<div class="accordion-body">
-							<div class="forecast-container">
-								<div id="${row1Id}" class="forecast-row"></div>
-								<div id="${row2Id}" class="forecast-row"></div>
-							</div>
-							<button class="btn btn-sm btn-danger mt-2" onclick="deleteBookmark(${loc.id})">Delete</button>
-						</div>
-					</div>
-				`;
-				accordionContainer.appendChild(accordionItem);
-				
-				// When an accordion item is expanded, load its forecast info
-				const collapseElem = accordionItem.querySelector(`#${collapseId}`);
-				collapseElem.addEventListener("shown.bs.collapse", () => {
-					getForecastForBookmark(loc.latitude, loc.longitude, row1Id, row2Id);
-				});
-			});
-		});
-}
-
 
 if (window.location.pathname.includes("bookmarks.html")) {
     checkAuthStatus(); // ensures currentUserId is set
