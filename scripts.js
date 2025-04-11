@@ -340,8 +340,8 @@ function checkAuthStatus() {
                 document.getElementById("account-status").innerText = "Signed in as " + currentUserId;
                 document.getElementById("login-btn").style.display = "none";
                 document.getElementById("logout-btn").style.display = "inline-block";
-                showSavedLocationsSection();
-                loadSavedLocations();
+                /*showSavedLocationsSection();*/
+                /*loadSavedLocations();*/
             } else {
                 document.getElementById("account-status").innerText = "Not signed in";
                 document.getElementById("login-btn").style.display = "inline-block";
