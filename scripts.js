@@ -346,6 +346,7 @@ function checkAuthStatus() {
         });
 }
 
+/*
 function loadBookmarks() {
   if (!currentUserId) return;
 
@@ -448,7 +449,7 @@ function getEndpointsForBookmark(lat, lon, cityStationId, row1Id, row2Id) {
     })
     .catch(err => console.error("Forecast loading failed:", err));
 }
-
+*/
 
 
 if (window.location.pathname.includes("bookmarks.html")) {
