@@ -1,6 +1,7 @@
 let currentUserId = null;
 let selectedLat = null;
 let selectedLng = null;
+let defaultCityName = ""; // For storing nearest city for default val for bookmarking.
 
 // Cookie helper functions
 function setCookie(cname, cvalue, exdays) {
@@ -112,6 +113,7 @@ async function getEndpoints(latitude, longitude) {
         const data = await fetchWithUserAgent(url);
 
         const { city, state } = data.properties.relativeLocation.properties;
+		defaultCityName = `${city}, ${state}`;
         const stationCode = data.properties.radarStation;
 
         const locationInfoDiv = document.getElementById("location-info");
@@ -288,7 +290,7 @@ window.addEventListener('load', function () {
 document.getElementById("bookmark-btn")?.addEventListener("click", () => {
     if (!selectedLat || !selectedLng || !currentUserId) return;
 
-    const locationName = prompt("Enter a name for this location:", "$(data.properties.radarStation)");
+    const locationName = prompt("Enter a name for this location:", defaultCityName);
     if (!locationName) return;
 
     fetch("/api/locations", {
