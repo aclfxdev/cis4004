@@ -303,7 +303,7 @@ function loadSavedLocations() {
                 item.className = "list-group-item";
                 item.innerHTML = `
 				<strong>${loc.location_name}</strong> (${loc.latitude}, ${loc.longitude})
-				<button class="btn btn-sm btn-danger">Delete</button>
+				<button class="btn btn-sm btn-danger" onclick="deleteBookmark(${loc.id})>Delete</button>
 				`;
                 item.addEventListener("click", () => getEndpoints(loc.latitude, loc.longitude));
                 list.appendChild(item);
@@ -347,6 +347,21 @@ function loadSavedLocations() {
         });
 }
 */
+
+function deleteBookmark(id) {
+  if (confirm("Are you sure you want to delete this bookmark?")) {
+    fetch(`/api/locations/${id}`, {
+      method: "DELETE"
+    })
+    .then(res => res.json())
+    .then(() => {
+      loadBookmarks(); // Refresh the list
+    })
+    .catch(err => {
+      console.error("❌ Failed to delete bookmark:", err);
+    });
+  }
+}
 
 document.getElementById("save-location-form")?.addEventListener("submit", function (e) {
     e.preventDefault();
