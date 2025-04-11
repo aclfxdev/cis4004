@@ -416,8 +416,8 @@ function checkAuthStatus() {
                 document.getElementById("login-btn").style.display = "inline-block";
                 document.getElementById("logout-btn").style.display = "none";
             }
+			updateBookmarkTextVisibility();
         });
-	updateBookmarkTextVisibility();
 }
 
 // NEW: Fetch forecast data for a bookmark and render cards into the given container IDs.
@@ -508,5 +508,4 @@ function updateBookmarkTextVisibility() {
 
 if (window.location.pathname.includes("bookmarks.html")) {
     checkAuthStatus(); // ensures currentUserId is set
-	
 }
