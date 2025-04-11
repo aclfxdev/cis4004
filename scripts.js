@@ -355,7 +355,7 @@ function deleteBookmark(id) {
     })
     .then(res => res.json())
     .then(() => {
-      loadBookmarks(); // Refresh the list
+    	location.reload(); // Force reload the page to refresh list.
     })
     .catch(err => {
       console.error("❌ Failed to delete bookmark:", err);
