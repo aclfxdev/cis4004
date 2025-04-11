@@ -279,7 +279,6 @@ window.addEventListener('load', function() {
     if (loginBtn) {
         const currentPath = window.location.pathname;
         loginBtn.href = "/.auth/login/google?post_login_redirect_uri=" + encodeURIComponent(currentPath);
-        console.log("Updated login btn href:", loginBtn.href);
     }
     
     // Then, check the authentication status:
