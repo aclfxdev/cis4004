@@ -288,11 +288,10 @@ window.addEventListener('load', function() {
 
 let currentUserId = null;
 
-/*
 function showSavedLocationsSection() {
     document.getElementById("saved-locations-container").style.display = "block";
 }
-*/
+
 
 /*
 function loadSavedLocations() {
