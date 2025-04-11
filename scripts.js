@@ -288,10 +288,13 @@ window.addEventListener('load', function() {
 
 let currentUserId = null;
 
+/*
 function showSavedLocationsSection() {
     document.getElementById("saved-locations-container").style.display = "block";
 }
+*/
 
+/*
 function loadSavedLocations() {
     fetch(`/api/locations/${currentUserId}`)
         .then(res => res.json())
@@ -307,6 +310,7 @@ function loadSavedLocations() {
             });
         });
 }
+*/
 
 document.getElementById("save-location-form")?.addEventListener("submit", function (e) {
     e.preventDefault();
