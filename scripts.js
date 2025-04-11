@@ -497,7 +497,7 @@ function createForecastCardsForBookmark(periods, row1Id, row2Id) {
 
 function updateBookmarkTextVisibility() {
     const container = document.getElementById("bookmarks-check");
-    if (currentUserId && selectedLat !== null && selectedLng !== null) {
+    if (currentUserId) {
         container.style.display = "none";
     } else {
         container.style.display = "block";
