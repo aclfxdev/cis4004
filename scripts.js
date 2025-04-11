@@ -298,7 +298,7 @@ function loadSavedLocations() {
         .then(locations => {
             const list = document.getElementById("saved-locations-list");
             list.innerHTML = '';
-            locations.forEach(index, loc => {
+            locations.forEach(loc => {
                 const item = document.createElement("li");
                 item.className = "list-group-item";
                 item.innerHTML = `
