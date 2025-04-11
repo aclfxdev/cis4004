@@ -303,6 +303,26 @@ function loadSavedLocations() {
                 item.className = "list-group-item";
                 item.innerHTML = `
 				<strong>${loc.location_name}</strong> (${loc.latitude}, ${loc.longitude})
+				<button class="btn btn-sm btn-danger">Delete</button>
+				`;
+                item.addEventListener("click", () => getEndpoints(loc.latitude, loc.longitude));
+                list.appendChild(item);
+            });
+        });
+}
+
+/* Use later for styling maybe
+function loadSavedLocations() {
+    fetch(`/api/locations/${currentUserId}`)
+        .then(res => res.json())
+        .then(locations => {
+            const list = document.getElementById("saved-locations-list");
+            list.innerHTML = '';
+            locations.forEach(index, loc => {
+                const item = document.createElement("li");
+                item.className = "list-group-item";
+                item.innerHTML = `
+				<strong>${loc.location_name}</strong> (${loc.latitude}, ${loc.longitude})
 				<div class="accordion" id="hurricaneAccordion">
 					<div class="accordion-item">
 						<h2 class="accordion-header" id="heading${index}">
@@ -310,7 +330,7 @@ function loadSavedLocations() {
 								<b>Test</b>
 							</button>
 						</h2>
-						<div id="collapse${index}" class="accordion-collapse collapse" aria-labelledby="heading1" data-bs-parent="#hurricaneAccordion">
+						<div id="collapse${index}" class="accordion-collapse collapse" aria-labelledby="heading${index}" data-bs-parent="#hurricaneAccordion">
 							<div class="accordion-body">
 								<div id="card-container">
 							<div id="row-1" class="forecast-row"></div>
@@ -326,6 +346,7 @@ function loadSavedLocations() {
             });
         });
 }
+*/
 
 document.getElementById("save-location-form")?.addEventListener("submit", function (e) {
     e.preventDefault();
