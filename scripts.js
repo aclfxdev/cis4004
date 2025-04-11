@@ -417,6 +417,7 @@ function checkAuthStatus() {
                 document.getElementById("logout-btn").style.display = "none";
             }
         });
+	updateBookmarkTextVisibility();
 }
 
 // NEW: Fetch forecast data for a bookmark and render cards into the given container IDs.
@@ -496,7 +497,7 @@ function createForecastCardsForBookmark(periods, row1Id, row2Id) {
 }
 
 function updateBookmarkTextVisibility() {
-    const container = document.getElementById("bookmarks-check");
+    const container = document.querySelector(".bookmarks-check");
     if (currentUserId != null) {
         container.style.display = "none";
     } else {
@@ -507,5 +508,5 @@ function updateBookmarkTextVisibility() {
 
 if (window.location.pathname.includes("bookmarks.html")) {
     checkAuthStatus(); // ensures currentUserId is set
-	updateBookmarkTextVisibility();
+	
 }
