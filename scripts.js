@@ -401,6 +401,134 @@ function checkAuthStatus() {
         });
 }
 
+// NEW: Fetch forecast data for a bookmark and render cards into the given container IDs.
+async function getForecastForBookmark(bookmarkLat, bookmarkLng, row1Id, row2Id) {
+	try {
+		// Get forecastHourly URL via weather.gov API
+		const url = `https://api.weather.gov/points/${bookmarkLat},${bookmarkLng}`;
+		const data = await fetchWithUserAgent(url);
+		const hourlyForecastUrl = data.properties.forecastHourly;
+		
+		// Fetch hourly forecast data
+		const forecastData = await fetchWithUserAgent(hourlyForecastUrl);
+		const periods = forecastData.properties.periods;
+		const now = new Date();
+		const cutoff = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+		const filteredPeriods = periods.filter(period => {
+			const periodStart = new Date(period.startTime);
+			return periodStart >= now && periodStart <= cutoff;
+		});
+		
+		createForecastCardsForBookmark(filteredPeriods, row1Id, row2Id);
+	} catch (error) {
+		console.error("Error fetching forecast for bookmark:", error);
+	}
+}
+
+// NEW: Create forecast cards into the provided container IDs (for row1 and row2).
+function createForecastCardsForBookmark(periods, row1Id, row2Id) {
+	const row1Container = document.getElementById(row1Id);
+	const row2Container = document.getElementById(row2Id);
+	if (!row1Container || !row2Container) return;
+	
+	// Clear previous forecast cards, if any
+	row1Container.innerHTML = "";
+	row2Container.innerHTML = "";
+	
+	const firstHalf = periods.slice(0, 12);
+	const secondHalf = periods.slice(12, 24);
+	
+	function createCard(element) {
+		const div = document.createElement("div");
+		div.className = "card";
+		
+		const h3 = document.createElement("h3");
+		const iconElem = document.createElement("i");
+		const p = document.createElement("p");
+		
+		const iconClass = getWeatherIconClass(element.shortForecast);
+		iconElem.className = `wi ${iconClass}`;
+		iconElem.classList.add("wi-3x");
+		
+		const localTime = new Date(element.startTime).toLocaleTimeString([], {
+			hour: "2-digit",
+			minute: "2-digit",
+			hour12: true
+		});
+		h3.textContent = localTime;
+		
+		let tempText;
+		if (element.temperatureUnit === "F") {
+			const fahrenheit = element.temperature;
+			const celsius = Math.round((fahrenheit - 32) * 5 / 9);
+			tempText = `${fahrenheit}°F (${celsius}°C)`;
+		} else {
+			tempText = `${element.temperature}°${element.temperatureUnit}`;
+		}
+		p.innerHTML = `${element.shortForecast}<br>${tempText}`;
+		
+		div.appendChild(h3);
+		div.appendChild(iconElem);
+		div.appendChild(p);
+		return div;
+	}
+	
+	firstHalf.forEach(element => row1Container.appendChild(createCard(element)));
+	secondHalf.forEach(element => row2Container.appendChild(createCard(element)));
+}
+
+// NEW: Rewrite the loadSavedLocations function to create an accordion for bookmarks.
+function loadSavedLocations() {
+	fetch(`/api/locations/${currentUserId}`)
+		.then(res => res.json())
+		.then(locations => {
+			const container = document.getElementById("saved-locations-list");
+			container.innerHTML = "";
+			
+			// Create an accordion container for the bookmarks
+			const accordionContainer = document.createElement("div");
+			accordionContainer.className = "accordion";
+			accordionContainer.id = "bookmarksAccordion";
+			container.appendChild(accordionContainer);
+			
+			locations.forEach(loc => {
+				// Use the bookmark id for unique element IDs
+				const itemId = loc.id;
+				const headingId = `bookmarkHeading-${itemId}`;
+				const collapseId = `bookmarkCollapse-${itemId}`;
+				const row1Id = `bookmarkRow1-${itemId}`;
+				const row2Id = `bookmarkRow2-${itemId}`;
+				
+				// Create the accordion item markup
+				const accordionItem = document.createElement("div");
+				accordionItem.className = "accordion-item";
+				accordionItem.innerHTML = `
+					<h2 class="accordion-header" id="${headingId}">
+						<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false" aria-controls="${collapseId}">
+							<strong>${loc.location_name}</strong> (${loc.latitude}, ${loc.longitude})
+						</button>
+					</h2>
+					<div id="${collapseId}" class="accordion-collapse collapse" aria-labelledby="${headingId}" data-bs-parent="#bookmarksAccordion">
+						<div class="accordion-body">
+							<div class="forecast-container">
+								<div id="${row1Id}" class="forecast-row"></div>
+								<div id="${row2Id}" class="forecast-row"></div>
+							</div>
+							<button class="btn btn-sm btn-danger mt-2" onclick="deleteBookmark(${loc.id})">Delete</button>
+						</div>
+					</div>
+				`;
+				accordionContainer.appendChild(accordionItem);
+				
+				// When an accordion item is expanded, load its forecast info
+				const collapseElem = accordionItem.querySelector(`#${collapseId}`);
+				collapseElem.addEventListener("shown.bs.collapse", () => {
+					getForecastForBookmark(loc.latitude, loc.longitude, row1Id, row2Id);
+				});
+			});
+		});
+}
+
 
 if (window.location.pathname.includes("bookmarks.html")) {
     checkAuthStatus(); // ensures currentUserId is set
