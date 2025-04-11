@@ -360,11 +360,7 @@ function loadBookmarks() {
         card.className = "col-12 mb-4 p-3 border rounded bg-dark text-white";
 		  
 		card.innerHTML = `
-          <div class="d-flex justify-content-between align-items-center">
-          	<strong>${loc.location_name}</strong> (${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)})
             <button class="btn">Delete</button>
-          </div>
-          <div id="forecast-${loc.id}" class="row mt-3"></div>
         `;
 		  
         /*card.innerHTML = `
