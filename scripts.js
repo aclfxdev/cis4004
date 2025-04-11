@@ -363,11 +363,7 @@ function loadBookmarks() {
         const card = document.createElement("div");
         card.className = "col-12 mb-4 p-3 border rounded bg-dark text-white";
 		  
-		card.innerHTML = `
-            <button class="btn">Delete</button>
-        `;
-		  
-        /*card.innerHTML = `
+        card.innerHTML = `
           <div class="d-flex justify-content-between align-items-center">
             <div>
               <strong>${loc.location_name}</strong> (${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)})
@@ -375,7 +371,7 @@ function loadBookmarks() {
             <button class="btn btn-sm btn-danger" onclick="deleteBookmark(${loc.id})">Delete</button>
           </div>
           <div id="forecast-${loc.id}" class="row mt-3"></div>
-        `;*/
+        `;
 
         container.appendChild(card);
 
