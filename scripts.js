@@ -320,14 +320,23 @@ function loadSavedLocations() {
 				accordionItem.className = "accordion-item";
 				accordionItem.innerHTML = `
 					<h2 class="accordion-header" id="${headingId}">
-						<div class="d-flex w-100 justify-content-between align-items-center">
-							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-								data-bs-target="#${collapseId}" aria-expanded="false" aria-controls="${collapseId}">
+						<!-- Position relative container -->
+						<div class="position-relative">
+
+							<!-- Main accordion toggle button -->
+							<button class="accordion-button collapsed pe-5" type="button"
+									data-bs-toggle="collapse"
+									data-bs-target="#${collapseId}" aria-expanded="false" aria-controls="${collapseId}">
 								<strong>${loc.location_name}</strong>
 							</button>
-							<button class="btn btn-sm btn-danger ms-2" onclick="deleteBookmark(${loc.id}); event.stopPropagation();">
+
+							<!-- Delete button absolutely positioned on the right -->
+							<button
+								class="btn btn-sm btn-danger position-absolute top-50 end-0 translate-middle-y me-3"
+								onclick="deleteBookmark(${loc.id}); event.stopPropagation();">
 								Delete
 							</button>
+
 						</div>
 					</h2>
 					<div id="${collapseId}" class="accordion-collapse collapse" aria-labelledby="${headingId}" data-bs-parent="#bookmarksAccordion">
