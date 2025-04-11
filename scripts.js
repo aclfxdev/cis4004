@@ -303,7 +303,7 @@ function loadSavedLocations() {
                 item.className = "list-group-item";
                 item.innerHTML = `
 				<strong>${loc.location_name}</strong> (${loc.latitude}, ${loc.longitude})
-				<button class="btn btn-sm btn-danger" onclick="deleteBookmark(${loc.id})>Delete</button>
+				<button class="btn btn-sm btn-danger" onclick="deleteBookmark(${loc.id})">Delete</button>
 				`;
                 item.addEventListener("click", () => getEndpoints(loc.latitude, loc.longitude));
                 list.appendChild(item);
