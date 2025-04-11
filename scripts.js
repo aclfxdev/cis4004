@@ -298,10 +298,29 @@ function loadSavedLocations() {
         .then(locations => {
             const list = document.getElementById("saved-locations-list");
             list.innerHTML = '';
-            locations.forEach(loc => {
+            locations.forEach(index, loc => {
                 const item = document.createElement("li");
                 item.className = "list-group-item";
-                item.innerHTML = `<strong>${loc.location_name}</strong> (${loc.latitude}, ${loc.longitude})`;
+                item.innerHTML = `
+				<strong>${loc.location_name}</strong> (${loc.latitude}, ${loc.longitude})
+				<div class="accordion" id="hurricaneAccordion">
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="heading${index}">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${index}" aria-expanded="false" aria-controls="collapse${index}">
+								<b>Test</b>
+							</button>
+						</h2>
+						<div id="collapse${index}" class="accordion-collapse collapse" aria-labelledby="heading1" data-bs-parent="#hurricaneAccordion">
+							<div class="accordion-body">
+								<div id="card-container">
+							<div id="row-1" class="forecast-row"></div>
+							<div id="row-2" class="forecast-row"></div>
+						</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				`;
                 item.addEventListener("click", () => getEndpoints(loc.latitude, loc.longitude));
                 list.appendChild(item);
             });
