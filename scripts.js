@@ -292,7 +292,6 @@ function showSavedLocationsSection() {
     document.getElementById("saved-locations-container").style.display = "block";
 }
 
-
 function loadSavedLocations() {
     fetch(`/api/locations/${currentUserId}`)
         .then(res => res.json())
@@ -308,7 +307,6 @@ function loadSavedLocations() {
             });
         });
 }
-
 
 document.getElementById("save-location-form")?.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -338,8 +336,8 @@ function checkAuthStatus() {
                 document.getElementById("account-status").innerText = "Signed in as " + currentUserId;
                 document.getElementById("login-btn").style.display = "none";
                 document.getElementById("logout-btn").style.display = "inline-block";
-                /*showSavedLocationsSection();*/
-                /*loadSavedLocations();*/
+                showSavedLocationsSection();
+                loadSavedLocations();
             } else {
                 document.getElementById("account-status").innerText = "Not signed in";
                 document.getElementById("login-btn").style.display = "inline-block";
@@ -348,7 +346,6 @@ function checkAuthStatus() {
         });
 }
 
-/*
 function loadBookmarks() {
   if (!currentUserId) return;
 
@@ -361,7 +358,7 @@ function loadBookmarks() {
       locations.forEach(loc => {
         const card = document.createElement("div");
         card.className = "col-12 mb-4 p-3 border rounded bg-dark text-white";
-		  
+
         card.innerHTML = `
           <div class="d-flex justify-content-between align-items-center">
             <div>
@@ -382,9 +379,7 @@ function loadBookmarks() {
       console.error("❌ Error loading bookmarks:", err);
     });
 }
-*/
 
-/*
 
 function deleteBookmark(id) {
   if (confirm("Are you sure you want to delete this bookmark?")) {
@@ -400,9 +395,8 @@ function deleteBookmark(id) {
     });
   }
 }
-*/
 
-/*
+
 function getEndpointsForBookmark(lat, lon, cityStationId, row1Id, row2Id) {
   fetchWithUserAgent(`https://api.weather.gov/points/${lat},${lon}`)
     .then(data => {
@@ -454,7 +448,7 @@ function getEndpointsForBookmark(lat, lon, cityStationId, row1Id, row2Id) {
     })
     .catch(err => console.error("Forecast loading failed:", err));
 }
-*/
+
 
 
 if (window.location.pathname.includes("bookmarks.html")) {
