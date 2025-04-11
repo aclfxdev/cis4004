@@ -495,6 +495,16 @@ function createForecastCardsForBookmark(periods, row1Id, row2Id) {
 	secondHalf.forEach(element => row2Container.appendChild(createCard(element)));
 }
 
+function updateBookmarkTextVisibility() {
+    const container = document.getElementById("bookmarks-check");
+    if (currentUserId && selectedLat !== null && selectedLng !== null) {
+        container.style.display = "none";
+    } else {
+        container.style.display = "block";
+    }
+}
+
+
 if (window.location.pathname.includes("bookmarks.html")) {
     checkAuthStatus(); // ensures currentUserId is set
 }
