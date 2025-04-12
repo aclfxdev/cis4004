@@ -22,7 +22,7 @@ ChatGPT
        -bookmarks.html
        -forecast-maps.html
        -scripts.js
-       -map-scripts.js
+       -map-scripts.js 
        
          
 
