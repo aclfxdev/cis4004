@@ -19,7 +19,7 @@ ChatGPT
        - Generate a JavaScript function that will let users save a location as a bookmark.
 
   Components affected:
-  - bookmarks.html
+       - bookmarks.html
        - forecast-maps.html
        - scripts.js
        - map-scripts.js 
