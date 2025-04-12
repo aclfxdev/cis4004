@@ -20,9 +20,9 @@ ChatGPT
 
   Components affected:
   - bookmarks.html
-       - forecast-maps.html
-       - scripts.js
-       - map-scripts.js 
+  - forecast-maps.html
+  - scripts.js
+  - map-scripts.js 
        
          
 
