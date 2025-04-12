@@ -213,6 +213,7 @@ function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
         center: initialLocation,
         zoom: 4,
+		mapTypeId: google.maps.MapTypeId.SATELLITE,  // Default view to satellite.
         mapId: "4a26c61826571d78"
     });
 
