@@ -1,4 +1,4 @@
-# cis4004
+# cis4004 Group 54 WeatherFL Project
 
 OBJECTIVE:
 Create a full-stack web application on weather-related information for UCF's CIS-4004 course.
